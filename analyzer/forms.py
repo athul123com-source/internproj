@@ -20,6 +20,15 @@ class ResumeUploadForm(forms.Form):
     resume = forms.FileField(
         widget=forms.ClearableFileInput(attrs={"accept": ".pdf,.docx,.txt"}),
     )
+    job_description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 6,
+                "placeholder": "Optional: paste a job description to compare your resume against the exact role requirements.",
+            }
+        ),
+    )
 
     def clean_resume(self):
         resume = self.cleaned_data["resume"]

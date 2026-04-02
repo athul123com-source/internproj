@@ -40,6 +40,7 @@
           <p class="eyebrow">Saved Dashboard</p>
           <h1 class="page-title">{{ analysis.role }} readiness report</h1>
           <p class="muted">{{ analysis.role_summary }}</p>
+          <p class="muted">{{ analysis.job_description_summary }}</p>
         </div>
         <div class="summary-meta">
           <div>
@@ -68,6 +69,41 @@
           <span>ATS score</span>
           <strong>{{ analysis.ats_score }}%</strong>
           <div class="progress-track"><div class="progress-fill cool" style="width: {{ analysis.ats_score }}%"></div></div>
+        </article>
+      </section>
+
+      <section class="chart-grid">
+        <article class="glass-card chart-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Section Scores</p>
+            <h3>Resume breakdown</h3>
+          </div>
+          <div class="bar-chart">
+            {% for item in analysis.section_scores %}
+              <div class="bar-row">
+                <span>{{ item.section }}</span>
+                <div class="bar-shell"><div class="bar-fill" style="width: {{ item.score }}%"></div></div>
+                <strong>{{ item.score }}%</strong>
+              </div>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="glass-card chart-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Gap Priority</p>
+            <h3>What to learn first</h3>
+          </div>
+          <div class="priority-list">
+            {% for item in analysis.prioritized_gaps %}
+              <div class="priority-item priority-{{ item.priority|lower }}">
+                <strong>{{ item.skill }}</strong>
+                <span>{{ item.priority }} priority</span>
+              </div>
+            {% empty %}
+              <div class="priority-item"><strong>No critical gaps</strong><span>Your current skills already align strongly.</span></div>
+            {% endfor %}
+          </div>
         </article>
       </section>
 
@@ -229,10 +265,45 @@
         </article>
       </section>
 
+      <section class="wide-grid">
+        <article class="glass-card wide-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Learning Links</p>
+            <h3>Recommended resources</h3>
+          </div>
+          <div class="resource-list">
+            {% for item in analysis.course_recommendations %}
+              <div class="resource-item">
+                <strong>{{ item.skill }}</strong>
+                <ul class="stack-list compact-list">
+                  {% for resource in item.resources %}
+                    <li>{{ resource }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% empty %}
+              <p class="muted">No course suggestions were needed for this report.</p>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="glass-card wide-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">JD Match</p>
+            <h3>Comparison mode</h3>
+          </div>
+          <ul class="stack-list">
+            <li>{% if analysis.job_description_used %}Custom job description was used for this analysis.{% else %}Used the built-in role profile because no custom JD was provided.{% endif %}</li>
+            <li>Role match score reflects the target skill set for this report.</li>
+            <li>Priority labels are based on missing skills and JD relevance.</li>
+          </ul>
+        </article>
+      </section>
+
       <section class="export-strip glass-card">
         <div>
           <p class="eyebrow">Export</p>
-          <h3>Save or share this report</h3>
+          <h3>Save or share this PDF report</h3>
         </div>
         <div class="export-actions">
           <a href="{% url 'history' %}" class="ghost-link">View saved dashboards</a>

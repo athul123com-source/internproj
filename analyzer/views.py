@@ -3,6 +3,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
 from .forms import RegisterForm, ResumeUploadForm
 from .models import AnalysisRun
@@ -22,10 +24,11 @@ def upload_resume(request):
     if request.method == "POST" and form.is_valid():
         resume = form.cleaned_data["resume"]
         role = form.cleaned_data["role"]
+        job_description = form.cleaned_data["job_description"]
 
         try:
             extracted_text = extract_resume_text(resume)
-            analysis = analyze_resume(extracted_text, role, resume.name)
+            analysis = analyze_resume(extracted_text, role, resume.name, job_description=job_description)
             run = AnalysisRun.objects.create(
                 owner=request.user,
                 role=analysis["role"],
@@ -84,30 +87,50 @@ def export_report(request, run_id):
         raise Http404("This dashboard is not available.")
 
     data = run.analysis_data or {}
-    lines = [
-        "Resume Analyzer Studio Report",
-        f"Filename: {run.filename}",
-        f"Role: {run.role}",
-        f"Resume Score: {run.resume_score}%",
-        "",
-        f"Role Match: {data.get('match_rate', 0)}%",
-        f"ATS Score: {data.get('ats_score', 0)}%",
-        f"Experience Level: {data.get('experience_level', 'Unknown')}",
-        "",
-        "Matched Skills:",
-        *[f"- {item}" for item in data.get("matched_skills", [])],
-        "",
-        "Missing Skills:",
-        *[f"- {item}" for item in data.get("missing_skills", [])],
-        "",
-        "Recommendations:",
-        *[f"- {item}" for item in data.get("recommendations", [])],
-        "",
-        "Interview Questions:",
-        *[f"- {item}" for item in data.get("interview_questions", [])],
-    ]
-    response = HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
-    response["Content-Disposition"] = f'attachment; filename="{run.filename.rsplit(".", 1)[0]}-report.txt"'
+    buffer = HttpResponse(content_type="application/pdf")
+    buffer["Content-Disposition"] = f'attachment; filename="{run.filename.rsplit(".", 1)[0]}-report.pdf"'
+
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+    y = height - 50
+
+    def write_line(text, size=11, gap=18, bold=False):
+        nonlocal y
+        if y < 60:
+            pdf.showPage()
+            y = height - 50
+        font = "Helvetica-Bold" if bold else "Helvetica"
+        pdf.setFont(font, size)
+        pdf.drawString(40, y, text[:110])
+        y -= gap
+
+    write_line("Resume Analyzer Studio Report", size=16, gap=26, bold=True)
+    write_line(f"Filename: {run.filename}")
+    write_line(f"Role: {run.role}")
+    write_line(f"Resume Score: {run.resume_score}%")
+    write_line(f"Role Match: {data.get('match_rate', 0)}%")
+    write_line(f"ATS Score: {data.get('ats_score', 0)}%")
+    write_line(f"Experience Level: {data.get('experience_level', 'Unknown')}")
+    write_line(f"Job Description Mode: {'Custom JD used' if data.get('job_description_used') else 'Built-in role profile'}", gap=24)
+
+    write_line("Matched Skills", bold=True)
+    for item in data.get("matched_skills", [])[:10]:
+        write_line(f"- {item}")
+
+    write_line("Priority Skill Gaps", gap=24, bold=True)
+    for item in data.get("prioritized_gaps", [])[:8]:
+        write_line(f"- {item['skill']} ({item['priority']})")
+
+    write_line("Recommendations", gap=24, bold=True)
+    for item in data.get("recommendations", [])[:6]:
+        write_line(f"- {item}")
+
+    write_line("Learning Resources", gap=24, bold=True)
+    for item in data.get("course_recommendations", [])[:4]:
+        write_line(f"- {item['skill']}: {', '.join(item['resources'])}")
+
+    pdf.save()
+    response = buffer
     return response
 
 

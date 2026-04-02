@@ -228,6 +228,29 @@ SKILL_ALIASES = {
     "journey mapping": ["journey mapping", "customer journey mapping"],
 }
 
+LEARNING_RESOURCES = {
+    "react": ["React official docs", "Frontend Mentor React challenges"],
+    "typescript": ["TypeScript handbook", "Type Challenges"],
+    "django": ["Django official tutorial", "Django REST tutorial"],
+    "postgresql": ["PostgreSQL tutorial", "SQLBolt practice"],
+    "docker": ["Docker getting started", "Play with Docker labs"],
+    "machine learning": ["Google ML Crash Course", "Kaggle Learn"],
+    "scikit-learn": ["scikit-learn user guide", "Hands-On ML exercises"],
+    "tensorflow": ["TensorFlow tutorials", "TensorFlow developer guides"],
+    "pytorch": ["PyTorch tutorials", "Learn PyTorch"],
+    "fastapi": ["FastAPI docs", "FastAPI full-stack examples"],
+    "figma": ["Figma beginner course", "Figma community files"],
+    "user research": ["Nielsen Norman research methods", "UX research field guide"],
+}
+
+SECTION_PATTERNS = {
+    "summary": ["summary", "profile", "objective", "about"],
+    "skills": ["skills", "technical skills", "core skills", "tech stack"],
+    "projects": ["projects", "project experience", "personal projects"],
+    "experience": ["experience", "work experience", "employment", "internship"],
+    "education": ["education", "academic background", "qualification"],
+}
+
 
 def extract_resume_text(uploaded_file):
     name = uploaded_file.name.lower()
@@ -268,27 +291,37 @@ def extract_docx_text_fallback(raw):
     return re.sub(r"\s+", " ", text).strip()
 
 
-def analyze_resume(text, role_key, filename):
+def analyze_resume(text, role_key, filename, job_description=""):
     role = JOB_ROLES[role_key]
     extracted_skills = extract_skills(text)
-    matched_skills = [skill for skill in role["skills"] if skill in extracted_skills]
-    missing_skills = [skill for skill in role["skills"] if skill not in extracted_skills]
-    match_rate = round((len(matched_skills) / len(role["skills"])) * 100) if role["skills"] else 0
+    jd_analysis = analyze_job_description(job_description, role)
+    target_skills = jd_analysis["target_skills"] or role["skills"]
+    matched_skills = [skill for skill in target_skills if skill in extracted_skills]
+    missing_skills = [skill for skill in target_skills if skill not in extracted_skills]
+    match_rate = round((len(matched_skills) / len(target_skills)) * 100) if target_skills else 0
     ats = compute_ats_signals(text)
     resume_score = round(match_rate * 0.6 + ats["score"] * 0.4)
     experience_level = detect_experience_level(text)
     highlights = extract_highlights(text)
+    section_scores = compute_section_scores(text, extracted_skills)
+    prioritized_gaps = prioritize_missing_skills(missing_skills, jd_analysis["jd_skills"])
+    course_recommendations = build_course_recommendations(missing_skills)
 
     return {
         "filename": filename,
         "role": role["title"],
         "role_summary": role["summary"],
+        "job_description_used": bool(job_description.strip()),
+        "job_description_summary": jd_analysis["summary"],
         "resume_score": resume_score,
         "match_rate": match_rate,
         "ats_score": ats["score"],
         "experience_level": experience_level,
         "matched_skills": matched_skills,
         "missing_skills": missing_skills,
+        "prioritized_gaps": prioritized_gaps,
+        "section_scores": section_scores,
+        "course_recommendations": course_recommendations,
         "strengths": [
             f"{len(matched_skills)} relevant skills match the target role.",
             *ats["strengths"][:2],
@@ -332,6 +365,86 @@ def extract_skills(text):
             found.add(normalized)
 
     return sorted(found)
+
+
+def analyze_job_description(job_description, role):
+    if not job_description or not job_description.strip():
+        return {
+            "summary": "Using the built-in role profile because no custom job description was provided.",
+            "jd_skills": [],
+            "target_skills": role["skills"],
+        }
+
+    jd_skills = extract_skills(job_description)
+    target_skills = []
+    for skill in role["skills"]:
+        if skill in jd_skills or not jd_skills:
+            target_skills.append(skill)
+    for skill in jd_skills:
+        if skill not in target_skills:
+            target_skills.append(skill)
+
+    return {
+        "summary": f"Compared against a custom job description with {len(jd_skills)} detected relevant skills.",
+        "jd_skills": jd_skills,
+        "target_skills": target_skills or role["skills"],
+    }
+
+
+def extract_section_text(text):
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    sections = {name: [] for name in SECTION_PATTERNS}
+    current_section = None
+
+    for line in lines:
+        matched_section = None
+        line_lower = line.lower()
+        for section, markers in SECTION_PATTERNS.items():
+            if any(line_lower == marker or line_lower.startswith(f"{marker}:") for marker in markers):
+                matched_section = section
+                break
+        if matched_section:
+            current_section = matched_section
+            continue
+        if current_section:
+            sections[current_section].append(line)
+
+    return {name: "\n".join(content).strip() for name, content in sections.items()}
+
+
+def compute_section_scores(text, extracted_skills):
+    sections = extract_section_text(text)
+    score_map = []
+    for section, content in sections.items():
+        if not content:
+            score = 18 if section != "summary" else 10
+        else:
+            section_skills = extract_skills(content)
+            length_bonus = min(len(content.split()), 80) // 4
+            score = min(100, 25 + len(section_skills) * 12 + length_bonus)
+        score_map.append({"section": section.title(), "score": score})
+    return score_map
+
+
+def prioritize_missing_skills(missing_skills, jd_skills):
+    priorities = []
+    for index, skill in enumerate(missing_skills):
+        if skill in jd_skills or index < 2:
+            label = "High"
+        elif index < 5:
+            label = "Medium"
+        else:
+            label = "Low"
+        priorities.append({"skill": skill, "priority": label})
+    return priorities
+
+
+def build_course_recommendations(missing_skills):
+    items = []
+    for skill in missing_skills[:5]:
+        resources = LEARNING_RESOURCES.get(skill, [f"{skill.title()} roadmap", f"{skill.title()} practical tutorial"])
+        items.append({"skill": skill, "resources": resources})
+    return items
 
 
 def compute_ats_signals(text):
