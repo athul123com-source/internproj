@@ -129,13 +129,103 @@ SKILL_SYNONYMS = {
     "ts": "typescript",
     "node": "node.js",
     "nodejs": "node.js",
+    "node.js": "node.js",
+    "node-js": "node.js",
     "expressjs": "express",
+    "reactjs": "react",
+    "react.js": "react",
+    "vuejs": "vue",
+    "nextjs": "next.js",
+    "next.js": "next.js",
+    "tailwindcss": "tailwind",
+    "tailwind-css": "tailwind",
+    "mongodb": "mongodb",
+    "mongo": "mongodb",
     "postgres": "postgresql",
+    "postgresql": "postgresql",
+    "postgre": "postgresql",
+    "postgressql": "postgresql",
     "ml": "machine learning",
+    "machinelearning": "machine learning",
+    "deeplearning": "deep learning",
+    "scikitlearn": "scikit-learn",
     "powerbi": "power bi",
     "scikitlearn": "scikit-learn",
     "restful": "rest api",
+    "restapis": "rest api",
+    "restapi": "rest api",
+    "api": "api design",
     "apis": "api design",
+    "uiux": "interaction design",
+    "wireframes": "wireframing",
+    "prototypes": "prototyping",
+    "figjam": "figma",
+    "nlp": "nlp",
+    "aws": "aws",
+    "pytorch": "pytorch",
+    "tensorflow": "tensorflow",
+}
+
+SKILL_ALIASES = {
+    "html": ["html5"],
+    "css": ["css3"],
+    "javascript": ["javascript", "java script", "js", "ecmascript"],
+    "typescript": ["typescript", "type script", "ts"],
+    "react": ["react", "reactjs", "react.js"],
+    "redux": ["redux", "redux toolkit"],
+    "tailwind": ["tailwind", "tailwindcss", "tailwind css"],
+    "vite": ["vite"],
+    "webpack": ["webpack"],
+    "responsive design": ["responsive design", "responsive ui", "mobile-first", "mobile first"],
+    "accessibility": ["accessibility", "a11y", "wcag", "accessible design"],
+    "rest api": ["rest api", "restful api", "restful apis", "rest services"],
+    "git": ["git", "github", "gitlab"],
+    "testing": ["testing", "unit testing", "integration testing", "pytest", "jest"],
+    "figma": ["figma", "figjam"],
+    "python": ["python"],
+    "django": ["django"],
+    "node.js": ["node.js", "nodejs", "node js"],
+    "express": ["express", "expressjs", "express js"],
+    "sql": ["sql", "mysql", "sqlite"],
+    "postgresql": ["postgresql", "postgres", "postgre sql"],
+    "mongodb": ["mongodb", "mongo db", "mongo"],
+    "authentication": ["authentication", "auth", "oauth", "jwt"],
+    "docker": ["docker", "containerization", "containers"],
+    "redis": ["redis"],
+    "microservices": ["microservices", "micro services"],
+    "api design": ["api design", "api architecture", "apis"],
+    "pandas": ["pandas"],
+    "numpy": ["numpy"],
+    "machine learning": ["machine learning", "ml"],
+    "statistics": ["statistics", "statistical analysis"],
+    "data visualization": ["data visualization", "data visualisation", "visualization", "visualisation"],
+    "scikit-learn": ["scikit-learn", "scikit learn", "sklearn"],
+    "feature engineering": ["feature engineering"],
+    "model evaluation": ["model evaluation", "model validation"],
+    "power bi": ["power bi", "powerbi"],
+    "tableau": ["tableau"],
+    "communication": ["communication", "stakeholder communication"],
+    "deep learning": ["deep learning", "deep neural networks"],
+    "nlp": ["nlp", "natural language processing"],
+    "tensorflow": ["tensorflow", "tensor flow"],
+    "pytorch": ["pytorch", "py torch"],
+    "mlops": ["mlops", "ml ops", "machine learning operations"],
+    "kubernetes": ["kubernetes", "k8s"],
+    "model deployment": ["model deployment", "deployment", "serving"],
+    "fastapi": ["fastapi", "fast api"],
+    "aws": ["aws", "amazon web services"],
+    "wireframing": ["wireframing", "wireframes", "wireframe"],
+    "prototyping": ["prototyping", "prototype", "prototypes"],
+    "user research": ["user research", "ux research"],
+    "design systems": ["design systems", "design system"],
+    "visual design": ["visual design", "ui design"],
+    "interaction design": ["interaction design", "ui/ux", "ui ux", "ux"],
+    "usability testing": ["usability testing", "usability tests"],
+    "information architecture": ["information architecture", "ia"],
+    "storytelling": ["storytelling", "presentation storytelling"],
+    "collaboration": ["collaboration", "cross-functional collaboration"],
+    "design thinking": ["design thinking"],
+    "journey mapping": ["journey mapping", "customer journey mapping"],
 }
 
 
@@ -158,6 +248,16 @@ def extract_resume_text(uploaded_file):
             return extract_docx_text_fallback(raw)
 
     raise ValueError("Unsupported file type. Please upload PDF, DOCX, or TXT.")
+
+
+def normalize_resume_text(text):
+    normalized = text.lower()
+    normalized = normalized.replace("&", " and ")
+    normalized = re.sub(r"(?<=[a-z])/(?=[a-z])", " ", normalized)
+    normalized = re.sub(r"(?<=[a-z])-(?=[a-z])", " ", normalized)
+    normalized = re.sub(r"(?<=[a-z])\.(?=[a-z])", "", normalized)
+    normalized = re.sub(r"\s+", " ", normalized)
+    return normalized.strip()
 
 
 def extract_docx_text_fallback(raw):
@@ -214,13 +314,17 @@ def normalize_skill(token):
 
 
 def extract_skills(text):
-    text_lower = text.lower()
+    text_lower = normalize_resume_text(text)
     known_skills = {skill for role in JOB_ROLES.values() for skill in role["skills"]}
     found = set()
 
     for skill in known_skills:
-        if re.search(rf"(^|[^a-z]){re.escape(skill)}([^a-z]|$)", text_lower):
-            found.add(skill)
+        variants = SKILL_ALIASES.get(skill, [skill])
+        for variant in variants:
+            pattern = rf"(^|[^a-z0-9]){re.escape(variant)}([^a-z0-9]|$)"
+            if re.search(pattern, text_lower):
+                found.add(skill)
+                break
 
     for token in tokenize_text(text):
         normalized = normalize_skill(token)
