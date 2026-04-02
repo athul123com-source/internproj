@@ -291,6 +291,24 @@ def normalize_resume_text(text):
     return normalized.strip()
 
 
+def build_loose_skill_pattern(variant):
+    cleaned = variant.lower().strip()
+    parts = re.split(r"[\s./+-]+", cleaned)
+    token_patterns = []
+
+    for part in parts:
+        alnum = re.sub(r"[^a-z0-9]", "", part)
+        if not alnum:
+            continue
+        token_patterns.append(r"\s*".join(re.escape(char) for char in alnum))
+
+    if not token_patterns:
+        return None
+
+    joined = r"[\s./+-]*".join(token_patterns)
+    return rf"(^|[^a-z0-9]){joined}([^a-z0-9]|$)"
+
+
 def has_meaningful_text(text):
     cleaned = re.sub(r"\s+", " ", text).strip()
     return len(cleaned) >= 40 and len(re.findall(r"[a-zA-Z]{2,}", cleaned)) >= 8
@@ -368,6 +386,7 @@ def normalize_skill(token):
 
 def extract_skills(text):
     text_lower = normalize_resume_text(text)
+    raw_lower = text.lower()
     known_skills = {skill for role in JOB_ROLES.values() for skill in role["skills"]}
     found = set()
 
@@ -375,7 +394,8 @@ def extract_skills(text):
         variants = SKILL_ALIASES.get(skill, [skill])
         for variant in variants:
             pattern = rf"(^|[^a-z0-9]){re.escape(variant)}([^a-z0-9]|$)"
-            if re.search(pattern, text_lower):
+            loose_pattern = build_loose_skill_pattern(variant)
+            if re.search(pattern, text_lower) or (loose_pattern and re.search(loose_pattern, raw_lower)):
                 found.add(skill)
                 break
 
