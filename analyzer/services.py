@@ -261,7 +261,15 @@ def extract_resume_text(uploaded_file):
 
     if name.endswith(".pdf"):
         reader = PdfReader(BytesIO(raw))
-        return "\n".join((page.extract_text() or "") for page in reader.pages).strip()
+        text = "\n".join((page.extract_text() or "") for page in reader.pages).strip()
+        if not has_meaningful_text(text):
+            if is_likely_scanned_pdf(raw):
+                raise ValueError(
+                    "This PDF looks like an image/scanned resume, so text could not be extracted reliably. "
+                    "Please upload a text-based PDF, DOCX, or TXT file."
+                )
+            raise ValueError("Text could not be extracted reliably from this PDF. Please try a DOCX or TXT file.")
+        return text
 
     if name.endswith(".docx"):
         try:
@@ -281,6 +289,18 @@ def normalize_resume_text(text):
     normalized = re.sub(r"(?<=[a-z])\.(?=[a-z])", "", normalized)
     normalized = re.sub(r"\s+", " ", normalized)
     return normalized.strip()
+
+
+def has_meaningful_text(text):
+    cleaned = re.sub(r"\s+", " ", text).strip()
+    return len(cleaned) >= 40 and len(re.findall(r"[a-zA-Z]{2,}", cleaned)) >= 8
+
+
+def is_likely_scanned_pdf(raw):
+    pdf_text = raw.decode("latin1", errors="ignore")
+    has_image_object = "/Subtype /Image" in pdf_text or "/XObject" in pdf_text
+    has_text_font = "/Font" in pdf_text or "BT" in pdf_text
+    return has_image_object and not has_meaningful_text(pdf_text) and not has_text_font
 
 
 def extract_docx_text_fallback(raw):
