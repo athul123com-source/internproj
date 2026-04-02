@@ -1,0 +1,244 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ run.filename }} Dashboard</title>
+    <link rel="stylesheet" href="{% static 'analyzer/styles.css' %}" />
+  </head>
+  <body>
+    <div class="background">
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="grid-glow"></div>
+    </div>
+    <main class="shell">
+      <nav class="topbar glass-card">
+        <a href="{% url 'upload' %}" class="brand">Resume Analyzer Studio</a>
+        <div class="nav-links">
+          <a href="{% url 'upload' %}">Upload</a>
+          <a href="{% url 'history' %}">History</a>
+          <a href="{% url 'export_report' run.id %}">Export</a>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="nav-button">Logout</button>
+          </form>
+        </div>
+      </nav>
+
+      {% if messages %}
+        <div class="message-stack">
+          {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <section class="glass-card summary-card page-card">
+        <div>
+          <p class="eyebrow">Saved Dashboard</p>
+          <h1 class="page-title">{{ analysis.role }} readiness report</h1>
+          <p class="muted">{{ analysis.role_summary }}</p>
+        </div>
+        <div class="summary-meta">
+          <div>
+            <span>File</span>
+            <strong>{{ run.filename }}</strong>
+          </div>
+          <div>
+            <span>Saved</span>
+            <strong>{{ run.created_at|date:"M d, Y" }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="metric-grid">
+        <article class="glass-card metric-card">
+          <span>Resume score</span>
+          <strong>{{ analysis.resume_score }}%</strong>
+          <div class="progress-track"><div class="progress-fill" style="width: {{ analysis.resume_score }}%"></div></div>
+        </article>
+        <article class="glass-card metric-card">
+          <span>Role match</span>
+          <strong>{{ analysis.match_rate }}%</strong>
+          <div class="progress-track"><div class="progress-fill warm" style="width: {{ analysis.match_rate }}%"></div></div>
+        </article>
+        <article class="glass-card metric-card">
+          <span>ATS score</span>
+          <strong>{{ analysis.ats_score }}%</strong>
+          <div class="progress-track"><div class="progress-fill cool" style="width: {{ analysis.ats_score }}%"></div></div>
+        </article>
+      </section>
+
+      <section class="chart-grid">
+        <article class="glass-card chart-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Visual Fit</p>
+            <h3>Score comparison</h3>
+          </div>
+          <div class="bar-chart">
+            <div class="bar-row">
+              <span>Resume</span>
+              <div class="bar-shell"><div class="bar-fill" style="width: {{ analysis.resume_score }}%"></div></div>
+              <strong>{{ analysis.resume_score }}%</strong>
+            </div>
+            <div class="bar-row">
+              <span>Role Match</span>
+              <div class="bar-shell"><div class="bar-fill warm" style="width: {{ analysis.match_rate }}%"></div></div>
+              <strong>{{ analysis.match_rate }}%</strong>
+            </div>
+            <div class="bar-row">
+              <span>ATS</span>
+              <div class="bar-shell"><div class="bar-fill cool" style="width: {{ analysis.ats_score }}%"></div></div>
+              <strong>{{ analysis.ats_score }}%</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="glass-card chart-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Coverage</p>
+            <h3>Skills health snapshot</h3>
+          </div>
+          <div class="donut-card">
+            <div class="donut" style="--value: {{ analysis.match_rate }};">
+              <span>{{ analysis.match_rate }}%</span>
+            </div>
+            <p class="muted">Current role-skill coverage based on extracted resume signals.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="insight-grid">
+        <article class="glass-card insight-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Skills</p>
+            <h3>Matched skills</h3>
+          </div>
+          <div class="chip-row">
+            {% for skill in analysis.matched_skills %}
+              <span class="chip good">{{ skill }}</span>
+            {% empty %}
+              <span class="chip">None</span>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="glass-card insight-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Gaps</p>
+            <h3>Missing skills</h3>
+          </div>
+          <div class="chip-row">
+            {% for skill in analysis.missing_skills %}
+              <span class="chip missing">{{ skill }}</span>
+            {% empty %}
+              <span class="chip">None</span>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="glass-card insight-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Strengths</p>
+            <h3>What already works</h3>
+          </div>
+          <ul class="stack-list">
+            {% for item in analysis.strengths %}
+              {% if item %}<li>{{ item }}</li>{% endif %}
+            {% endfor %}
+          </ul>
+        </article>
+
+        <article class="glass-card insight-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">ATS Review</p>
+            <h3>Fix these first</h3>
+          </div>
+          <ul class="stack-list">
+            {% for item in analysis.warnings %}
+              <li>{{ item }}</li>
+            {% empty %}
+              <li>No major ATS warnings detected.</li>
+            {% endfor %}
+          </ul>
+        </article>
+      </section>
+
+      <section class="wide-grid">
+        <article class="glass-card wide-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Recommendations</p>
+            <h3>Improvement plan</h3>
+          </div>
+          <ul class="stack-list">
+            {% for item in analysis.recommendations %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </article>
+
+        <article class="glass-card wide-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Interview Prep</p>
+            <h3>Questions to practice</h3>
+          </div>
+          <ul class="stack-list">
+            {% for item in analysis.interview_questions %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </article>
+      </section>
+
+      <section class="roadmap-grid">
+        <article class="glass-card roadmap-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Learning Roadmap</p>
+            <h3>Weekly upskilling path</h3>
+          </div>
+          <div class="timeline">
+            {% for item in analysis.learning_roadmap %}
+              <div class="timeline-item">
+                <strong>{{ item.week }}: {{ item.focus }}</strong>
+                <span>{{ item.mission }}</span>
+                <span>{{ item.output }}</span>
+              </div>
+            {% empty %}
+              <div class="timeline-item">
+                <strong>No roadmap needed</strong>
+                <span>Your current role alignment is already strong.</span>
+              </div>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="glass-card roadmap-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Highlights</p>
+            <h3>Resume text signals</h3>
+          </div>
+          <ul class="stack-list">
+            {% for item in analysis.highlights %}
+              <li>{{ item }}</li>
+            {% empty %}
+              <li>No highlight lines were extracted from the uploaded resume.</li>
+            {% endfor %}
+          </ul>
+        </article>
+      </section>
+
+      <section class="export-strip glass-card">
+        <div>
+          <p class="eyebrow">Export</p>
+          <h3>Save or share this report</h3>
+        </div>
+        <div class="export-actions">
+          <a href="{% url 'history' %}" class="ghost-link">View saved dashboards</a>
+          <a href="{% url 'export_report' run.id %}" class="ghost-link">Download report</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

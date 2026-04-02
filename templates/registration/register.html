@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <link rel="stylesheet" href="{% static 'analyzer/styles.css' %}" />
+  </head>
+  <body>
+    <div class="background">
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="grid-glow"></div>
+    </div>
+    <main class="shell auth-shell">
+      <section class="glass-card auth-card">
+        <div class="section-heading">
+          <p class="eyebrow">Account</p>
+          <h1 class="page-title">Create account</h1>
+        </div>
+        <form method="post" class="auth-form">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="primary-button">Create account</button>
+        </form>
+        <p class="muted auth-note">Already have one? <a href="{% url 'login' %}">Login</a></p>
+      </section>
+    </main>
+  </body>
+</html>

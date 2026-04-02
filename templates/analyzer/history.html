@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analysis History</title>
+    <link rel="stylesheet" href="{% static 'analyzer/styles.css' %}" />
+  </head>
+  <body>
+    <div class="background">
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="grid-glow"></div>
+    </div>
+    <main class="shell">
+      <nav class="topbar glass-card">
+        <a href="{% url 'upload' %}" class="brand">Resume Analyzer Studio</a>
+        <div class="nav-links">
+          <a href="{% url 'upload' %}">Upload</a>
+          <a href="{% url 'history' %}">History</a>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="nav-button">Logout</button>
+          </form>
+        </div>
+      </nav>
+
+      <section class="glass-card history-card page-card">
+        <div class="section-heading">
+          <p class="eyebrow">History</p>
+          <h1 class="page-title">{{ page_title }}</h1>
+        </div>
+        <div class="history-list">
+          {% for run in runs %}
+            <div class="history-item history-item-rich">
+              <div>
+                <strong>{{ run.filename }}</strong>
+                <span>{{ run.role }}</span>
+                <span>{{ run.created_at|date:"M d, Y H:i" }}</span>
+              </div>
+              <div class="history-actions">
+                <div class="history-score">{{ run.resume_score }}%</div>
+                <a href="{% url 'detail' run.id %}" class="ghost-link">Open</a>
+                <a href="{% url 'export_report' run.id %}" class="ghost-link">Export</a>
+              </div>
+            </div>
+          {% empty %}
+            <div class="history-empty">No saved analyses yet.</div>
+          {% endfor %}
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

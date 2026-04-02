@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Analyzer Studio</title>
+    <link rel="stylesheet" href="{% static 'analyzer/styles.css' %}" />
+  </head>
+  <body>
+    <div class="background">
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="grid-glow"></div>
+    </div>
+
+    <main class="shell">
+      <nav class="topbar glass-card">
+        <a href="{% url 'upload' %}" class="brand">Resume Analyzer Studio</a>
+        <div class="nav-links">
+          <a href="{% url 'upload' %}">Upload</a>
+          <a href="{% url 'history' %}">History</a>
+          <span class="nav-user">{{ request.user.username }}</span>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="nav-button">Logout</button>
+          </form>
+        </div>
+      </nav>
+
+      <section class="hero glass-card hero-card">
+        <div class="hero-copy">
+          <p class="eyebrow">AI Resume Analyzing and Evaluation</p>
+          <h1>Upload your resume and start the analysis flow.</h1>
+          <p class="hero-text">
+            This page is now the dedicated upload step. Choose a role, upload a resume, and the app
+            will take you to a separate results page with score, roadmap, charts, and recommendations.
+          </p>
+          <div class="hero-badges">
+            <span>Step 1: Upload</span>
+            <span>Step 2: Analyze</span>
+            <span>Step 3: Results</span>
+            <span>(PDF / DOCX / TXT)</span>
+          </div>
+        </div>
+
+        <div class="hero-visual glass-panel">
+          <div class="metric-stack">
+            <div class="mini-stat">
+              <span>Total analyses</span>
+              <strong>{{ stats.total_runs }}</strong>
+            </div>
+            <div class="mini-stat">
+              <span>Best score</span>
+              <strong>{{ stats.best_score }}%</strong>
+            </div>
+            <div class="mini-stat">
+              <span>Latest role</span>
+              <strong>{{ stats.latest_role }}</strong>
+            </div>
+          </div>
+          <div class="rings">
+            <div class="ring ring-one"></div>
+            <div class="ring ring-two"></div>
+            <div class="ring ring-three"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="composer">
+        <form class="glass-card form-card" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="section-heading">
+            <p class="eyebrow">Analyzer</p>
+            <h2>Upload and evaluate</h2>
+          </div>
+
+          {% if messages %}
+            <div class="message-stack">
+              {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <label class="field">
+            <span>Target role</span>
+            {{ form.role }}
+            {% if form.role.errors %}
+              <small class="error-text">{{ form.role.errors|join:", " }}</small>
+            {% endif %}
+          </label>
+
+          <label class="uploader" for="{{ form.resume.id_for_label }}">
+            {{ form.resume }}
+            <span class="upload-title">Drop resume here or click to browse</span>
+            <span class="upload-subtitle">Supports PDF, DOCX, and TXT up to 7MB</span>
+          </label>
+          {% if form.resume.errors %}
+            <small class="error-text">{{ form.resume.errors|join:", " }}</small>
+          {% endif %}
+
+          <button class="primary-button" type="submit">Analyze Resume</button>
+        </form>
+
+        <aside class="glass-card notes-card">
+          <div class="section-heading">
+            <p class="eyebrow">Dashboard Pulse</p>
+            <h2>Project snapshot</h2>
+          </div>
+          <div class="snapshot-grid">
+            <div class="snapshot-item">
+              <span>Total analyses</span>
+              <strong>{{ stats.total_runs }}</strong>
+            </div>
+            <div class="snapshot-item">
+              <span>Best score</span>
+              <strong>{{ stats.best_score }}%</strong>
+            </div>
+            <div class="snapshot-item">
+              <span>Latest role</span>
+              <strong>{{ stats.latest_role }}</strong>
+            </div>
+          </div>
+          <ul class="feature-list">
+            <li>ATS score diagnostics with recruiter-style warnings</li>
+            <li>Role-targeted interview questions</li>
+            <li>Weekly learning roadmap for missing skills</li>
+            <li>Persistent analysis history model ready for expansion</li>
+          </ul>
+          <div class="aside-actions">
+            <a href="{% url 'history' %}" class="ghost-link">Open history</a>
+            {% if latest_run %}
+              <a href="{% url 'detail' latest_run.id %}" class="ghost-link">Open latest result</a>
+            {% endif %}
+          </div>
+        </aside>
+      </section>
+
+      <section class="history-grid">
+        <article class="glass-card history-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Recent Activity</p>
+            <h2>Latest resume analyses</h2>
+          </div>
+          <div class="history-list">
+            {% for run in recent_runs %}
+              <div class="history-item">
+                <div>
+                  <strong>{{ run.filename }}</strong>
+                  <span>{{ run.role }}</span>
+                </div>
+                <div class="history-actions">
+                  <div class="history-score">{{ run.resume_score }}%</div>
+                  <a href="{% url 'detail' run.id %}" class="ghost-link">Open</a>
+                </div>
+              </div>
+            {% empty %}
+              <div class="history-empty">
+                No analyses yet. Upload a resume to generate your first dashboard.
+              </div>
+            {% endfor %}
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="{% static 'analyzer/app.js' %}"></script>
+  </body>
+</html>
