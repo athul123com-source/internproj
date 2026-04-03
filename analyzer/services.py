@@ -431,6 +431,7 @@ def analyze_resume(text, role_key, filename, job_description=""):
     section_scores = compute_section_scores(text, extracted_skills)
     prioritized_gaps = prioritize_missing_skills(missing_skills, jd_analysis["jd_skills"])
     course_recommendations = build_course_recommendations(missing_skills)
+    bullet_improvements = build_bullet_improvements(highlights, matched_skills, missing_skills)
 
     return {
         "filename": filename,
@@ -447,6 +448,7 @@ def analyze_resume(text, role_key, filename, job_description=""):
         "prioritized_gaps": prioritized_gaps,
         "section_scores": section_scores,
         "course_recommendations": course_recommendations,
+        "bullet_improvements": bullet_improvements,
         "strengths": [
             f"{len(matched_skills)} relevant skills match the target role.",
             *ats["strengths"][:2],
@@ -583,6 +585,30 @@ def build_course_recommendations(missing_skills):
         resources = LEARNING_RESOURCES.get(skill, [f"{skill.title()} roadmap", f"{skill.title()} practical tutorial"])
         items.append({"skill": skill, "resources": resources})
     return items
+
+
+def build_bullet_improvements(highlights, matched_skills, missing_skills):
+    suggestions = []
+    action_skill = matched_skills[0] if matched_skills else "the role's core stack"
+    metric_skill = missing_skills[0] if missing_skills else "business impact"
+
+    for line in highlights[:3]:
+        cleaned = normalize_whitespace(line)
+        improved = (
+            f"Delivered {action_skill}-driven work that improved product quality or delivery speed, "
+            f"with clear metrics and stronger ownership language around {metric_skill}."
+        )
+        suggestions.append({"before": cleaned, "after": improved})
+
+    if not suggestions:
+        suggestions.append(
+            {
+                "before": "Built a project using modern web technologies.",
+                "after": "Built and shipped a production-ready web project using React and TypeScript, improving load speed and user experience with measurable results.",
+            }
+        )
+
+    return suggestions
 
 
 def compute_ats_signals(text):

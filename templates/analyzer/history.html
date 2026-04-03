@@ -18,6 +18,7 @@
         <a href="{% url 'upload' %}" class="brand">Resume Analyzer Studio</a>
         <div class="nav-links">
           <a href="{% url 'upload' %}">Upload</a>
+          <a href="{% url 'profile' %}">Profile</a>
           <a href="{% url 'history' %}">History</a>
           <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
@@ -31,6 +32,29 @@
           <p class="eyebrow">History</p>
           <h1 class="page-title">{{ page_title }}</h1>
         </div>
+        <form method="get" class="filter-grid">
+          <label class="field">
+            <span>Search</span>
+            <input type="text" name="q" value="{{ filters.q }}" placeholder="Search by file or role" />
+          </label>
+          <label class="field">
+            <span>Role</span>
+            <select name="role">
+              <option value="">All roles</option>
+              {% for option in role_options %}
+                <option value="{{ option }}" {% if filters.role == option %}selected{% endif %}>{{ option }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="field">
+            <span>Minimum score</span>
+            <input type="number" name="min_score" min="0" max="100" value="{{ filters.min_score }}" placeholder="70" />
+          </label>
+          <div class="filter-actions">
+            <button type="submit" class="primary-button slim-button">Apply filters</button>
+            <a href="{% url 'history' %}" class="ghost-link">Reset</a>
+          </div>
+        </form>
         <div class="history-list">
           {% for run in runs %}
             <div class="history-item history-item-rich">

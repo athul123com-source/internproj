@@ -19,6 +19,7 @@
         <a href="{% url 'upload' %}" class="brand">Resume Analyzer Studio</a>
         <div class="nav-links">
           <a href="{% url 'upload' %}">Upload</a>
+          <a href="{% url 'profile' %}">Profile</a>
           <a href="{% url 'history' %}">History</a>
           <span class="nav-user">{{ request.user.username }}</span>
           <form method="post" action="{% url 'logout' %}">

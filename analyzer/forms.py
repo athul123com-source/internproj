@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+from .models import UserProfile
+
 
 ROLE_CHOICES = [
     ("frontend-developer", "Frontend Developer"),
@@ -46,3 +48,13 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("username", "email", "password1", "password2")
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ("full_name", "phone", "college", "degree", "graduation_year", "target_role")
+        widgets = {
+            "graduation_year": forms.NumberInput(attrs={"placeholder": "2027"}),
+            "target_role": forms.TextInput(attrs={"placeholder": "Frontend Developer"}),
+        }

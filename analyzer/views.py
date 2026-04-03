@@ -3,11 +3,12 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.db.models import Q
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
-from .forms import RegisterForm, ResumeUploadForm
-from .models import AnalysisRun
+from .forms import ProfileForm, RegisterForm, ResumeUploadForm
+from .models import AnalysisRun, UserProfile
 from .services import analyze_resume, extract_resume_text
 
 
@@ -67,8 +68,29 @@ def upload_resume(request):
 @login_required
 def history(request):
     runs = AnalysisRun.objects.filter(owner=request.user)
+    query = request.GET.get("q", "").strip()
+    role = request.GET.get("role", "").strip()
+    min_score = request.GET.get("min_score", "").strip()
+
+    if query:
+        runs = runs.filter(Q(filename__icontains=query) | Q(role__icontains=query))
+    if role:
+        runs = runs.filter(role__iexact=role)
+    if min_score.isdigit():
+        runs = runs.filter(resume_score__gte=int(min_score))
+
+    role_options = AnalysisRun.objects.filter(owner=request.user).values_list("role", flat=True).distinct()
     title = "Your saved dashboards"
-    return render(request, "analyzer/history.html", {"runs": runs[:24], "page_title": title})
+    return render(
+        request,
+        "analyzer/history.html",
+        {
+            "runs": runs[:24],
+            "page_title": title,
+            "filters": {"q": query, "role": role, "min_score": min_score},
+            "role_options": role_options,
+        },
+    )
 
 
 @login_required
@@ -125,6 +147,11 @@ def export_report(request, run_id):
     for item in data.get("recommendations", [])[:6]:
         write_line(f"- {item}")
 
+    write_line("Bullet Improvements", gap=24, bold=True)
+    for item in data.get("bullet_improvements", [])[:3]:
+        write_line(f"- Before: {item['before']}")
+        write_line(f"  After: {item['after']}")
+
     write_line("Learning Resources", gap=24, bold=True)
     for item in data.get("course_recommendations", [])[:4]:
         write_line(f"- {item['skill']}: {', '.join(item['resources'])}")
@@ -142,3 +169,25 @@ def register(request):
         messages.success(request, "Account created. Your future analyses will be saved to your dashboard.")
         return redirect("upload")
     return render(request, "registration/register.html", {"form": form})
+
+
+@login_required
+def profile(request):
+    profile_obj, _ = UserProfile.objects.get_or_create(user=request.user)
+    form = ProfileForm(request.POST or None, instance=profile_obj)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Profile updated successfully.")
+        return redirect("profile")
+
+    recent_runs = AnalysisRun.objects.filter(owner=request.user)[:3]
+    return render(
+        request,
+        "analyzer/profile.html",
+        {
+            "form": form,
+            "profile_obj": profile_obj,
+            "recent_runs": recent_runs,
+        },
+    )

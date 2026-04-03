@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <link rel="stylesheet" href="{% static 'analyzer/styles.css' %}" />
+  </head>
+  <body>
+    <div class="background">
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="grid-glow"></div>
+    </div>
+    <main class="shell">
+      <nav class="topbar glass-card">
+        <a href="{% url 'upload' %}" class="brand">Resume Analyzer Studio</a>
+        <div class="nav-links">
+          <a href="{% url 'upload' %}">Upload</a>
+          <a href="{% url 'profile' %}">Profile</a>
+          <a href="{% url 'history' %}">History</a>
+          <span class="nav-user">{{ request.user.username }}</span>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="nav-button">Logout</button>
+          </form>
+        </div>
+      </nav>
+
+      <section class="glass-card summary-card page-card">
+        <div>
+          <p class="eyebrow">Profile</p>
+          <h1 class="page-title">Career profile</h1>
+          <p class="muted">Save your academic details and target role so the project feels more complete during demos and reviews.</p>
+        </div>
+        <div class="summary-meta">
+          <div>
+            <span>Account</span>
+            <strong>{{ request.user.username }}</strong>
+          </div>
+          <div>
+            <span>Email</span>
+            <strong>{{ request.user.email|default:"Not added" }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="composer">
+        <form method="post" class="glass-card form-card">
+          {% csrf_token %}
+          <div class="section-heading">
+            <p class="eyebrow">Details</p>
+            <h2>Update your profile</h2>
+          </div>
+
+          {% if messages %}
+            <div class="message-stack">
+              {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% for field in form %}
+            <label class="field">
+              <span>{{ field.label }}</span>
+              {{ field }}
+              {% if field.errors %}
+                <small class="error-text">{{ field.errors|join:", " }}</small>
+              {% endif %}
+            </label>
+          {% endfor %}
+
+          <button type="submit" class="primary-button">Save profile</button>
+        </form>
+
+        <aside class="glass-card notes-card">
+          <div class="section-heading">
+            <p class="eyebrow">Snapshot</p>
+            <h2>Current details</h2>
+          </div>
+          <div class="snapshot-grid">
+            <div class="snapshot-item">
+              <span>Full name</span>
+              <strong>{{ profile_obj.full_name|default:"Not added" }}</strong>
+            </div>
+            <div class="snapshot-item">
+              <span>College</span>
+              <strong>{{ profile_obj.college|default:"Not added" }}</strong>
+            </div>
+            <div class="snapshot-item">
+              <span>Target role</span>
+              <strong>{{ profile_obj.target_role|default:"Not added" }}</strong>
+            </div>
+          </div>
+          <div class="section-heading compact">
+            <p class="eyebrow">Recent Reports</p>
+            <h3>Quick access</h3>
+          </div>
+          <div class="history-list">
+            {% for run in recent_runs %}
+              <div class="history-item">
+                <div>
+                  <strong>{{ run.filename }}</strong>
+                  <span>{{ run.role }}</span>
+                </div>
+                <div class="history-actions">
+                  <div class="history-score">{{ run.resume_score }}%</div>
+                  <a href="{% url 'detail' run.id %}" class="ghost-link">Open</a>
+                </div>
+              </div>
+            {% empty %}
+              <div class="history-empty">No saved analyses yet.</div>
+            {% endfor %}
+          </div>
+        </aside>
+      </section>
+    </main>
+  </body>
+</html>
