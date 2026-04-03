@@ -171,20 +171,20 @@ SKILL_SYNONYMS = {
 }
 
 SKILL_ALIASES = {
-    "html": ["html5"],
-    "css": ["css3"],
+    "html": ["html", "html5"],
+    "css": ["css", "css3", "scss", "sass", "styled components", "styled-components"],
     "javascript": ["javascript", "java script", "js", "ecmascript"],
-    "typescript": ["typescript", "type script", "ts"],
+    "typescript": ["typescript", "type script", "ts", "tsx"],
     "react": ["react", "reactjs", "react.js"],
     "redux": ["redux", "redux toolkit"],
-    "tailwind": ["tailwind", "tailwindcss", "tailwind css"],
+    "tailwind": ["tailwind", "tailwindcss", "tailwind css", "tailwind ui"],
     "vite": ["vite"],
-    "webpack": ["webpack"],
-    "responsive design": ["responsive design", "responsive ui", "mobile-first", "mobile first"],
-    "accessibility": ["accessibility", "a11y", "wcag", "accessible design"],
-    "rest api": ["rest api", "restful api", "restful apis", "rest services"],
-    "git": ["git", "github", "gitlab"],
-    "testing": ["testing", "unit testing", "integration testing", "pytest", "jest"],
+    "webpack": ["webpack", "module bundler"],
+    "responsive design": ["responsive design", "responsive ui", "responsive web design", "mobile-first", "mobile first"],
+    "accessibility": ["accessibility", "a11y", "wcag", "accessible design", "web accessibility"],
+    "rest api": ["rest api", "restful api", "restful apis", "rest services", "api integration"],
+    "git": ["git", "github", "gitlab", "version control"],
+    "testing": ["testing", "unit testing", "integration testing", "frontend testing", "pytest", "jest", "cypress", "vitest"],
     "figma": ["figma", "figjam"],
     "python": ["python"],
     "django": ["django"],
@@ -256,20 +256,62 @@ SECTION_PATTERNS = {
 }
 
 
+def normalize_whitespace(text):
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def repair_fragmented_pdf_text(text):
+    repaired = text or ""
+    repaired = re.sub(r"(?<=\w)-\s+(?=\w)", "", repaired)
+    repaired = re.sub(r"(?<=\w)\s{2,}(?=\w)", " ", repaired)
+
+    leading_split_word = re.compile(r"\b(?:[A-Za-z]\s){1,}[A-Za-z][A-Za-z0-9+#.-]*\b")
+    repaired = leading_split_word.sub(lambda match: match.group(0).replace(" ", ""), repaired)
+
+    fully_split_word = re.compile(r"\b(?:[A-Za-z0-9+#.-]\s){2,}[A-Za-z0-9+#.-]\b")
+    repaired = fully_split_word.sub(lambda match: match.group(0).replace(" ", ""), repaired)
+    return repaired
+
+
+def build_search_variants(text):
+    raw_text = text or ""
+    repaired_text = repair_fragmented_pdf_text(raw_text)
+    variants = []
+
+    for candidate in (raw_text, repaired_text):
+        lowered = candidate.lower()
+        variants.extend(
+            [
+                lowered,
+                normalize_resume_text(candidate),
+                re.sub(r"[^a-z0-9]+", "", lowered),
+            ]
+        )
+
+    unique_variants = []
+    seen = set()
+    for item in variants:
+        compact = item.strip()
+        if compact and compact not in seen:
+            unique_variants.append(compact)
+            seen.add(compact)
+    return unique_variants
+
+
 def extract_resume_text(uploaded_file):
     name = uploaded_file.name.lower()
     raw = uploaded_file.read()
 
     if name.endswith(".txt"):
-        return raw.decode("utf-8", errors="ignore")
+        return repair_fragmented_pdf_text(raw.decode("utf-8", errors="ignore"))
 
     if name.endswith(".pdf"):
         reader = PdfReader(BytesIO(raw))
-        text = "\n".join((page.extract_text() or "") for page in reader.pages).strip()
+        text = repair_fragmented_pdf_text("\n".join((page.extract_text() or "") for page in reader.pages).strip())
         if not has_meaningful_text(text):
             ocr_text = extract_text_with_ocr(raw, uploaded_file.name)
             if has_meaningful_text(ocr_text):
-                return ocr_text
+                return repair_fragmented_pdf_text(ocr_text)
             if is_likely_scanned_pdf(raw):
                 raise ValueError(
                     "This PDF looks like an image/scanned resume, and OCR is not configured or could not extract enough text. "
@@ -284,9 +326,15 @@ def extract_resume_text(uploaded_file):
     if name.endswith(".docx"):
         try:
             document = Document(BytesIO(raw))
-            return "\n".join(paragraph.text for paragraph in document.paragraphs if paragraph.text.strip()).strip()
+            parts = [paragraph.text for paragraph in document.paragraphs if paragraph.text.strip()]
+            for table in document.tables:
+                for row in table.rows:
+                    row_text = " ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                    if row_text:
+                        parts.append(row_text)
+            return repair_fragmented_pdf_text("\n".join(parts).strip())
         except Exception:
-            return extract_docx_text_fallback(raw)
+            return repair_fragmented_pdf_text(extract_docx_text_fallback(raw))
 
     raise ValueError("Unsupported file type. Please upload PDF, DOCX, or TXT.")
 
@@ -424,25 +472,29 @@ def normalize_skill(token):
 
 
 def extract_skills(text):
-    text_lower = normalize_resume_text(text)
-    raw_lower = text.lower()
-    compressed_text = re.sub(r"[^a-z0-9]+", "", raw_lower)
+    search_variants = build_search_variants(text)
     known_skills = {skill for role in JOB_ROLES.values() for skill in role["skills"]}
     found = set()
 
     for skill in known_skills:
-        variants = SKILL_ALIASES.get(skill, [skill])
+        variants = list(dict.fromkeys([skill, *SKILL_ALIASES.get(skill, [])]))
         for variant in variants:
-            pattern = rf"(^|[^a-z0-9]){re.escape(variant)}([^a-z0-9]|$)"
             loose_pattern = build_loose_skill_pattern(variant)
             normalized_variant = re.sub(r"[^a-z0-9]+", "", variant.lower())
-            compressed_match = normalized_variant and len(normalized_variant) >= 4 and normalized_variant in compressed_text
-            if (
-                re.search(pattern, text_lower)
-                or (loose_pattern and re.search(loose_pattern, raw_lower))
-                or compressed_match
-            ):
-                found.add(skill)
+            exact_pattern = rf"(^|[^a-z0-9]){re.escape(variant.lower())}([^a-z0-9]|$)"
+
+            for search_text in search_variants:
+                compressed_search = re.sub(r"[^a-z0-9]+", "", search_text)
+                compressed_match = normalized_variant and len(normalized_variant) >= 4 and normalized_variant in compressed_search
+                if (
+                    re.search(exact_pattern, search_text)
+                    or (loose_pattern and re.search(loose_pattern, search_text))
+                    or compressed_match
+                ):
+                    found.add(skill)
+                    break
+
+            if skill in found:
                 break
 
     for token in tokenize_text(text):
