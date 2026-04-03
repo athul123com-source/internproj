@@ -232,101 +232,6 @@ SKILL_ALIASES = {
     "journey mapping": ["journey mapping", "customer journey mapping"],
 }
 
-LEARNING_RESOURCES = {
-    "html": [
-        {"title": "MDN HTML Guide", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML", "action": "Learn semantic structure, forms, and accessible markup."},
-        {"title": "MDN HTML Introduction", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content", "action": "Practice core tags and page structure with beginner exercises."},
-    ],
-    "css": [
-        {"title": "MDN CSS Guide", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS", "action": "Review selectors, layout, spacing, and responsive styling."},
-        {"title": "MDN Layout Cookbook", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Layout_cookbook", "action": "Apply real layout patterns you can reuse in projects."},
-    ],
-    "javascript": [
-        {"title": "MDN JavaScript Guide", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript", "action": "Strengthen fundamentals, DOM work, and async concepts."},
-        {"title": "JavaScript.info", "url": "https://javascript.info/", "action": "Work through practical explanations and coding examples."},
-    ],
-    "typescript": [
-        {"title": "TypeScript Handbook", "url": "https://www.typescriptlang.org/docs/", "action": "Learn types, interfaces, generics, and project setup."},
-        {"title": "Type Challenges", "url": "https://type-challenges.fero23.me/", "action": "Practice TypeScript problem solving with hands-on exercises."},
-    ],
-    "react": [
-        {"title": "React Learn", "url": "https://react.dev/learn", "action": "Go through components, state, effects, and data flow."},
-        {"title": "Frontend Mentor React Challenges", "url": "https://www.frontendmentor.io/challenges?languages=React", "action": "Build portfolio-ready React projects with realistic UI tasks."},
-    ],
-    "redux": [
-        {"title": "Redux Essentials Tutorial", "url": "https://redux.js.org/tutorials/essentials/part-1-overview-concepts", "action": "Understand store setup, slices, and async state handling."},
-        {"title": "Redux Toolkit Quick Start", "url": "https://redux-toolkit.js.org/tutorials/quick-start", "action": "Learn the modern Redux approach used in real apps."},
-    ],
-    "tailwind": [
-        {"title": "Tailwind CSS Docs", "url": "https://tailwindcss.com/docs", "action": "Learn utility classes, layout patterns, and customization."},
-        {"title": "Tailwind CLI Setup", "url": "https://tailwindcss.com/docs/installation/tailwind-cli", "action": "Set up Tailwind in a small practice project and use it end to end."},
-    ],
-    "vite": [
-        {"title": "Vite Getting Started", "url": "https://vite.dev/guide/", "action": "Learn how to scaffold, run, and build modern frontend apps."},
-        {"title": "Vite Features Guide", "url": "https://vite.dev/guide/features.html", "action": "Understand dev server features, assets, and environment handling."},
-    ],
-    "responsive design": [
-        {"title": "web.dev Responsive Design", "url": "https://web.dev/learn/design", "action": "Study layout, breakpoints, fluid sizing, and mobile-first design."},
-        {"title": "MDN Responsive Design", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Responsive_Design", "action": "Practice media queries and responsive CSS techniques."},
-    ],
-    "accessibility": [
-        {"title": "W3C Accessibility Introduction", "url": "https://www.w3.org/WAI/fundamentals/accessibility-intro/", "action": "Understand why accessibility matters and how to build for everyone."},
-        {"title": "MDN Accessibility Guide", "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility", "action": "Apply keyboard, semantic, and screen-reader-friendly practices."},
-    ],
-    "rest api": [
-        {"title": "MDN REST Glossary", "url": "https://developer.mozilla.org/en-US/docs/Glossary/REST", "action": "Understand REST concepts, endpoints, and resource-based design."},
-        {"title": "REST API Tutorial", "url": "https://restfulapi.net/", "action": "Review methods, status codes, and practical API design basics."},
-    ],
-    "git": [
-        {"title": "Pro Git Book", "url": "https://git-scm.com/book/en/v2", "action": "Learn commits, branching, merging, and collaboration workflows."},
-        {"title": "Git Documentation", "url": "https://git-scm.com/docs", "action": "Look up exact commands when practicing version control."},
-    ],
-    "testing": [
-        {"title": "Jest Getting Started", "url": "https://jestjs.io/docs/getting-started", "action": "Write basic unit tests and understand test runner setup."},
-        {"title": "Testing Library Docs", "url": "https://testing-library.com/docs/", "action": "Practice user-focused frontend testing patterns."},
-    ],
-    "figma": [
-        {"title": "Figma Help Center", "url": "https://help.figma.com/hc/en-us", "action": "Learn the basics of frames, components, and collaborative design."},
-        {"title": "Figma Learn Design", "url": "https://www.figma.com/resource-library/design-basics/", "action": "Study practical UI design foundations and component thinking."},
-    ],
-    "django": [
-        {"title": "Django Tutorial", "url": "https://docs.djangoproject.com/en/stable/intro/tutorial01/", "action": "Build a Django app and understand views, models, and routing."},
-        {"title": "Django Documentation", "url": "https://docs.djangoproject.com/en/stable/", "action": "Use the official reference while extending backend features."},
-    ],
-    "postgresql": [
-        {"title": "PostgreSQL Tutorial", "url": "https://www.postgresql.org/docs/current/tutorial.html", "action": "Learn SQL basics, tables, and querying in PostgreSQL."},
-        {"title": "SQLBolt", "url": "https://sqlbolt.com/", "action": "Practice database queries interactively."},
-    ],
-    "docker": [
-        {"title": "Docker Getting Started", "url": "https://docs.docker.com/get-started/", "action": "Learn containers, images, and basic Docker workflows."},
-        {"title": "Play with Docker", "url": "https://labs.play-with-docker.com/", "action": "Practice Docker commands in a browser-based environment."},
-    ],
-    "machine learning": [
-        {"title": "Google ML Crash Course", "url": "https://developers.google.com/machine-learning/crash-course", "action": "Study ML fundamentals and practical model concepts."},
-        {"title": "Kaggle Learn", "url": "https://www.kaggle.com/learn", "action": "Practice machine learning workflows with guided exercises."},
-    ],
-    "scikit-learn": [
-        {"title": "scikit-learn User Guide", "url": "https://scikit-learn.org/stable/user_guide.html", "action": "Learn preprocessing, models, and evaluation with sklearn."},
-        {"title": "scikit-learn Tutorials", "url": "https://scikit-learn.org/stable/tutorial/index.html", "action": "Work through examples and model-building flows."},
-    ],
-    "tensorflow": [
-        {"title": "TensorFlow Tutorials", "url": "https://www.tensorflow.org/tutorials", "action": "Practice model building, training, and deployment basics."},
-        {"title": "TensorFlow Guide", "url": "https://www.tensorflow.org/guide", "action": "Understand the main TensorFlow workflow in depth."},
-    ],
-    "pytorch": [
-        {"title": "PyTorch Tutorials", "url": "https://pytorch.org/tutorials/", "action": "Learn tensors, training loops, and model development."},
-        {"title": "Learn PyTorch", "url": "https://www.learnpytorch.io/", "action": "Follow a practical end-to-end PyTorch learning path."},
-    ],
-    "fastapi": [
-        {"title": "FastAPI Tutorial", "url": "https://fastapi.tiangolo.com/tutorial/", "action": "Build APIs, validation, and routing with FastAPI."},
-        {"title": "FastAPI Docs", "url": "https://fastapi.tiangolo.com/", "action": "Use the official reference while building backend projects."},
-    ],
-    "user research": [
-        {"title": "NNGroup UX Research Methods", "url": "https://www.nngroup.com/topic/user-research/", "action": "Learn core research methods used in design projects."},
-        {"title": "Interaction Design Foundation", "url": "https://www.interaction-design.org/literature/topics/user-research", "action": "Understand how to plan and apply user research."},
-    ],
-}
-
 SECTION_PATTERNS = {
     "summary": ["summary", "profile", "objective", "about"],
     "skills": ["skills", "technical skills", "core skills", "tech stack"],
@@ -659,24 +564,27 @@ def prioritize_missing_skills(missing_skills, jd_skills):
     return priorities
 
 
+def build_learning_links(skill):
+    query = skill.replace(" ", "+")
+    readable = skill.title()
+    return [
+        {
+            "title": f"{readable} YouTube learning path",
+            "url": f"https://www.youtube.com/results?search_query={query}+full+course",
+            "action": f"Open a YouTube full-course search and pick one structured course for {skill}.",
+        },
+        {
+            "title": f"{readable} roadmap / PDF search",
+            "url": f"https://www.google.com/search?q={query}+roadmap+pdf",
+            "action": f"Open a roadmap or PDF-style learning path for {skill} and follow it step by step.",
+        },
+    ]
+
+
 def build_course_recommendations(missing_skills):
     items = []
     for skill in missing_skills[:5]:
-        resources = LEARNING_RESOURCES.get(
-            skill,
-            [
-                {
-                    "title": f"{skill.title()} roadmap",
-                    "url": f"https://www.google.com/search?q={skill.replace(' ', '+')}+roadmap",
-                    "action": f"Search for a structured learning path for {skill}.",
-                },
-                {
-                    "title": f"{skill.title()} practical tutorial",
-                    "url": f"https://www.google.com/search?q={skill.replace(' ', '+')}+practical+tutorial",
-                    "action": f"Build one hands-on project around {skill}.",
-                },
-            ],
-        )
+        resources = build_learning_links(skill)
         items.append({"skill": skill, "resources": resources})
     return items
 
@@ -689,11 +597,33 @@ def build_bullet_improvements(highlights, matched_skills, missing_skills):
     for line in highlights:
         cleaned = normalize_whitespace(line)
         lower = cleaned.lower()
-        if len(cleaned.split()) < 5:
+        if len(cleaned.split()) < 7:
             continue
-        if re.fullmatch(r"[a-z0-9 .,/()-]+(?:\d{4}.*)?", lower) and not any(char in lower for char in ["%", "built", "develop", "improv", "design", "lead", "implement", "create", "migrat", "optimiz"]):
+        if not any(
+            verb in lower
+            for verb in [
+                "built",
+                "develop",
+                "improv",
+                "design",
+                "lead",
+                "implement",
+                "create",
+                "migrat",
+                "optimiz",
+                "integrat",
+                "launch",
+                "deliver",
+                "refactor",
+                "manage",
+                "collaborat",
+                "architect",
+            ]
+        ):
             continue
         if lower.count("github.com") or lower.count("@") or re.search(r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b", lower):
+            continue
+        if re.search(r"\b(?:present|owner|developer|contributor|stars?)\b", lower) and not any(char in lower for char in ["%", "improv", "built", "integrat", "deliver", "optimiz", "refactor"]):
             continue
         candidate_lines.append(cleaned)
 
@@ -726,12 +656,7 @@ def build_bullet_improvements(highlights, matched_skills, missing_skills):
         suggestions.append({"before": line, "after": rewrite_line(line, index)})
 
     if not suggestions:
-        suggestions.append(
-            {
-                "before": "Built a project using modern web technologies.",
-                "after": "Built and shipped a production-ready web project using React and TypeScript, improving load speed and user experience with measurable results.",
-            }
-        )
+        return []
 
     return suggestions
 

@@ -407,8 +407,13 @@ textarea:focus,
   background: linear-gradient(180deg, rgba(143, 168, 255, 0.08), rgba(255, 255, 255, 0.02));
 }
 
-.resource-link-card a {
+.resource-link-card {
+  display: block;
+}
+
+.resource-link-card span {
   color: var(--text-theme);
+  font-weight: 700;
 }
 
 @media (max-width: 720px) {

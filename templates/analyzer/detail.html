@@ -230,24 +230,26 @@
         </article>
       </section>
 
-      <section class="wide-grid">
-        <article class="glass-card wide-card">
-          <div class="section-heading compact">
-            <p class="eyebrow">Rewrite Help</p>
-            <h3>Bullet improvement suggestions</h3>
-          </div>
-          <div class="rewrite-list">
-            {% for item in analysis.bullet_improvements %}
-              <div class="rewrite-card">
-                <strong>Before</strong>
-                <p class="muted">{{ item.before }}</p>
-                <strong>After</strong>
-                <p>{{ item.after }}</p>
-              </div>
-            {% endfor %}
-          </div>
-        </article>
-      </section>
+      {% if analysis.bullet_improvements %}
+        <section class="wide-grid">
+          <article class="glass-card wide-card">
+            <div class="section-heading compact">
+              <p class="eyebrow">Rewrite Help</p>
+              <h3>Bullet improvement suggestions</h3>
+            </div>
+            <div class="rewrite-list">
+              {% for item in analysis.bullet_improvements %}
+                <div class="rewrite-card">
+                  <strong>Before</strong>
+                  <p class="muted">{{ item.before }}</p>
+                  <strong>After</strong>
+                  <p>{{ item.after }}</p>
+                </div>
+              {% endfor %}
+            </div>
+          </article>
+        </section>
+      {% endif %}
 
       <section class="roadmap-grid">
         <article class="glass-card roadmap-card">
@@ -298,10 +300,10 @@
                 <strong>{{ item.skill }}</strong>
                 <div class="resource-links">
                   {% for resource in item.resources %}
-                    <div class="resource-link-card">
-                      <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer">{{ resource.title }}</a>
+                    <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-link-card">
+                      <span>{{ resource.title }}</span>
                       <p class="muted">{{ resource.action }}</p>
-                    </div>
+                    </a>
                   {% endfor %}
                 </div>
               </div>
