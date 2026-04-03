@@ -265,15 +265,18 @@ def extract_resume_text(uploaded_file):
         reader = PdfReader(BytesIO(raw))
         text = "\n".join((page.extract_text() or "") for page in reader.pages).strip()
         if not has_meaningful_text(text):
+            ocr_text = extract_text_with_ocr(raw, uploaded_file.name)
+            if has_meaningful_text(ocr_text):
+                return ocr_text
             if is_likely_scanned_pdf(raw):
-                ocr_text = extract_text_with_ocr(raw, uploaded_file.name)
-                if has_meaningful_text(ocr_text):
-                    return ocr_text
                 raise ValueError(
                     "This PDF looks like an image/scanned resume, and OCR is not configured or could not extract enough text. "
                     "Please upload a text-based PDF, DOCX, or TXT file."
                 )
-            raise ValueError("Text could not be extracted reliably from this PDF. Please try a DOCX or TXT file.")
+            raise ValueError(
+                "Text could not be extracted reliably from this PDF, and OCR could not recover enough text either. "
+                "Please try a DOCX or TXT file."
+            )
         return text
 
     if name.endswith(".docx"):
