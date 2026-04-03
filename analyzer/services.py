@@ -1,9 +1,11 @@
 import re
 import zipfile
+import os
 from io import BytesIO
 
 from PyPDF2 import PdfReader
 from docx import Document
+import requests
 
 
 JOB_ROLES = {
@@ -264,8 +266,11 @@ def extract_resume_text(uploaded_file):
         text = "\n".join((page.extract_text() or "") for page in reader.pages).strip()
         if not has_meaningful_text(text):
             if is_likely_scanned_pdf(raw):
+                ocr_text = extract_text_with_ocr(raw, uploaded_file.name)
+                if has_meaningful_text(ocr_text):
+                    return ocr_text
                 raise ValueError(
-                    "This PDF looks like an image/scanned resume, so text could not be extracted reliably. "
+                    "This PDF looks like an image/scanned resume, and OCR is not configured or could not extract enough text. "
                     "Please upload a text-based PDF, DOCX, or TXT file."
                 )
             raise ValueError("Text could not be extracted reliably from this PDF. Please try a DOCX or TXT file.")
@@ -319,6 +324,35 @@ def is_likely_scanned_pdf(raw):
     has_image_object = "/Subtype /Image" in pdf_text or "/XObject" in pdf_text
     has_text_font = "/Font" in pdf_text or "BT" in pdf_text
     return has_image_object and not has_meaningful_text(pdf_text) and not has_text_font
+
+
+def extract_text_with_ocr(raw, filename):
+    api_key = os.getenv("OCR_SPACE_API_KEY", "").strip()
+    if not api_key:
+        return ""
+
+    try:
+        response = requests.post(
+            "https://api.ocr.space/parse/image",
+            data={
+                "apikey": api_key,
+                "language": "eng",
+                "isOverlayRequired": False,
+                "detectOrientation": True,
+                "scale": True,
+                "OCREngine": 2,
+            },
+            files={"file": (filename, raw)},
+            timeout=60,
+        )
+        response.raise_for_status()
+        payload = response.json()
+    except Exception:
+        return ""
+
+    parsed_results = payload.get("ParsedResults") or []
+    texts = [item.get("ParsedText", "") for item in parsed_results if item.get("ParsedText")]
+    return "\n".join(texts).strip()
 
 
 def extract_docx_text_fallback(raw):

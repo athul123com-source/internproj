@@ -5,6 +5,7 @@ Resume Analyzer Studio is a Django-based resume analysis project inspired by the
 ## Features
 
 - Resume upload support for `PDF`, `DOCX`, and `TXT`
+- Optional OCR fallback for scanned/image-based PDFs when `OCR_SPACE_API_KEY` is configured
 - Skill extraction and job-role matching
 - Missing skill detection and resume scoring
 - ATS-focused warnings and strengths
@@ -50,6 +51,7 @@ DJANGO_DEBUG=False
 DJANGO_SECRET_KEY=replace-this-with-a-real-secret
 DJANGO_ALLOWED_HOSTS=your-app-domain.com
 DJANGO_CSRF_TRUSTED_ORIGINS=https://your-app-domain.com
+OCR_SPACE_API_KEY=your-ocr-space-api-key
 ```
 
 See [SHARE_DEPLOYMENT.txt](/d:/Intern/SHARE_DEPLOYMENT.txt) for a simple deployment guide.
