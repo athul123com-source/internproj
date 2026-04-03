@@ -141,6 +141,8 @@ SKILL_SYNONYMS = {
     "next.js": "next.js",
     "tailwindcss": "tailwind",
     "tailwind-css": "tailwind",
+    "scss": "css",
+    "sass": "css",
     "mongodb": "mongodb",
     "mongo": "mongodb",
     "postgres": "postgresql",
@@ -424,6 +426,7 @@ def normalize_skill(token):
 def extract_skills(text):
     text_lower = normalize_resume_text(text)
     raw_lower = text.lower()
+    compressed_text = re.sub(r"[^a-z0-9]+", "", raw_lower)
     known_skills = {skill for role in JOB_ROLES.values() for skill in role["skills"]}
     found = set()
 
@@ -432,7 +435,13 @@ def extract_skills(text):
         for variant in variants:
             pattern = rf"(^|[^a-z0-9]){re.escape(variant)}([^a-z0-9]|$)"
             loose_pattern = build_loose_skill_pattern(variant)
-            if re.search(pattern, text_lower) or (loose_pattern and re.search(loose_pattern, raw_lower)):
+            normalized_variant = re.sub(r"[^a-z0-9]+", "", variant.lower())
+            compressed_match = normalized_variant and len(normalized_variant) >= 4 and normalized_variant in compressed_text
+            if (
+                re.search(pattern, text_lower)
+                or (loose_pattern and re.search(loose_pattern, raw_lower))
+                or compressed_match
+            ):
                 found.add(skill)
                 break
 
