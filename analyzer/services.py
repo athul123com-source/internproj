@@ -233,18 +233,98 @@ SKILL_ALIASES = {
 }
 
 LEARNING_RESOURCES = {
-    "react": ["React official docs", "Frontend Mentor React challenges"],
-    "typescript": ["TypeScript handbook", "Type Challenges"],
-    "django": ["Django official tutorial", "Django REST tutorial"],
-    "postgresql": ["PostgreSQL tutorial", "SQLBolt practice"],
-    "docker": ["Docker getting started", "Play with Docker labs"],
-    "machine learning": ["Google ML Crash Course", "Kaggle Learn"],
-    "scikit-learn": ["scikit-learn user guide", "Hands-On ML exercises"],
-    "tensorflow": ["TensorFlow tutorials", "TensorFlow developer guides"],
-    "pytorch": ["PyTorch tutorials", "Learn PyTorch"],
-    "fastapi": ["FastAPI docs", "FastAPI full-stack examples"],
-    "figma": ["Figma beginner course", "Figma community files"],
-    "user research": ["Nielsen Norman research methods", "UX research field guide"],
+    "html": [
+        {"title": "MDN HTML Guide", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML", "action": "Learn semantic structure, forms, and accessible markup."},
+        {"title": "MDN HTML Introduction", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content", "action": "Practice core tags and page structure with beginner exercises."},
+    ],
+    "css": [
+        {"title": "MDN CSS Guide", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS", "action": "Review selectors, layout, spacing, and responsive styling."},
+        {"title": "MDN Layout Cookbook", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Layout_cookbook", "action": "Apply real layout patterns you can reuse in projects."},
+    ],
+    "javascript": [
+        {"title": "MDN JavaScript Guide", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript", "action": "Strengthen fundamentals, DOM work, and async concepts."},
+        {"title": "JavaScript.info", "url": "https://javascript.info/", "action": "Work through practical explanations and coding examples."},
+    ],
+    "typescript": [
+        {"title": "TypeScript Handbook", "url": "https://www.typescriptlang.org/docs/", "action": "Learn types, interfaces, generics, and project setup."},
+        {"title": "Type Challenges", "url": "https://type-challenges.fero23.me/", "action": "Practice TypeScript problem solving with hands-on exercises."},
+    ],
+    "react": [
+        {"title": "React Learn", "url": "https://react.dev/learn", "action": "Go through components, state, effects, and data flow."},
+        {"title": "Frontend Mentor React Challenges", "url": "https://www.frontendmentor.io/challenges?languages=React", "action": "Build portfolio-ready React projects with realistic UI tasks."},
+    ],
+    "redux": [
+        {"title": "Redux Essentials Tutorial", "url": "https://redux.js.org/tutorials/essentials/part-1-overview-concepts", "action": "Understand store setup, slices, and async state handling."},
+        {"title": "Redux Toolkit Quick Start", "url": "https://redux-toolkit.js.org/tutorials/quick-start", "action": "Learn the modern Redux approach used in real apps."},
+    ],
+    "tailwind": [
+        {"title": "Tailwind CSS Docs", "url": "https://tailwindcss.com/docs", "action": "Learn utility classes, layout patterns, and customization."},
+        {"title": "Tailwind CLI Setup", "url": "https://tailwindcss.com/docs/installation/tailwind-cli", "action": "Set up Tailwind in a small practice project and use it end to end."},
+    ],
+    "vite": [
+        {"title": "Vite Getting Started", "url": "https://vite.dev/guide/", "action": "Learn how to scaffold, run, and build modern frontend apps."},
+        {"title": "Vite Features Guide", "url": "https://vite.dev/guide/features.html", "action": "Understand dev server features, assets, and environment handling."},
+    ],
+    "responsive design": [
+        {"title": "web.dev Responsive Design", "url": "https://web.dev/learn/design", "action": "Study layout, breakpoints, fluid sizing, and mobile-first design."},
+        {"title": "MDN Responsive Design", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Responsive_Design", "action": "Practice media queries and responsive CSS techniques."},
+    ],
+    "accessibility": [
+        {"title": "W3C Accessibility Introduction", "url": "https://www.w3.org/WAI/fundamentals/accessibility-intro/", "action": "Understand why accessibility matters and how to build for everyone."},
+        {"title": "MDN Accessibility Guide", "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility", "action": "Apply keyboard, semantic, and screen-reader-friendly practices."},
+    ],
+    "rest api": [
+        {"title": "MDN REST Glossary", "url": "https://developer.mozilla.org/en-US/docs/Glossary/REST", "action": "Understand REST concepts, endpoints, and resource-based design."},
+        {"title": "REST API Tutorial", "url": "https://restfulapi.net/", "action": "Review methods, status codes, and practical API design basics."},
+    ],
+    "git": [
+        {"title": "Pro Git Book", "url": "https://git-scm.com/book/en/v2", "action": "Learn commits, branching, merging, and collaboration workflows."},
+        {"title": "Git Documentation", "url": "https://git-scm.com/docs", "action": "Look up exact commands when practicing version control."},
+    ],
+    "testing": [
+        {"title": "Jest Getting Started", "url": "https://jestjs.io/docs/getting-started", "action": "Write basic unit tests and understand test runner setup."},
+        {"title": "Testing Library Docs", "url": "https://testing-library.com/docs/", "action": "Practice user-focused frontend testing patterns."},
+    ],
+    "figma": [
+        {"title": "Figma Help Center", "url": "https://help.figma.com/hc/en-us", "action": "Learn the basics of frames, components, and collaborative design."},
+        {"title": "Figma Learn Design", "url": "https://www.figma.com/resource-library/design-basics/", "action": "Study practical UI design foundations and component thinking."},
+    ],
+    "django": [
+        {"title": "Django Tutorial", "url": "https://docs.djangoproject.com/en/stable/intro/tutorial01/", "action": "Build a Django app and understand views, models, and routing."},
+        {"title": "Django Documentation", "url": "https://docs.djangoproject.com/en/stable/", "action": "Use the official reference while extending backend features."},
+    ],
+    "postgresql": [
+        {"title": "PostgreSQL Tutorial", "url": "https://www.postgresql.org/docs/current/tutorial.html", "action": "Learn SQL basics, tables, and querying in PostgreSQL."},
+        {"title": "SQLBolt", "url": "https://sqlbolt.com/", "action": "Practice database queries interactively."},
+    ],
+    "docker": [
+        {"title": "Docker Getting Started", "url": "https://docs.docker.com/get-started/", "action": "Learn containers, images, and basic Docker workflows."},
+        {"title": "Play with Docker", "url": "https://labs.play-with-docker.com/", "action": "Practice Docker commands in a browser-based environment."},
+    ],
+    "machine learning": [
+        {"title": "Google ML Crash Course", "url": "https://developers.google.com/machine-learning/crash-course", "action": "Study ML fundamentals and practical model concepts."},
+        {"title": "Kaggle Learn", "url": "https://www.kaggle.com/learn", "action": "Practice machine learning workflows with guided exercises."},
+    ],
+    "scikit-learn": [
+        {"title": "scikit-learn User Guide", "url": "https://scikit-learn.org/stable/user_guide.html", "action": "Learn preprocessing, models, and evaluation with sklearn."},
+        {"title": "scikit-learn Tutorials", "url": "https://scikit-learn.org/stable/tutorial/index.html", "action": "Work through examples and model-building flows."},
+    ],
+    "tensorflow": [
+        {"title": "TensorFlow Tutorials", "url": "https://www.tensorflow.org/tutorials", "action": "Practice model building, training, and deployment basics."},
+        {"title": "TensorFlow Guide", "url": "https://www.tensorflow.org/guide", "action": "Understand the main TensorFlow workflow in depth."},
+    ],
+    "pytorch": [
+        {"title": "PyTorch Tutorials", "url": "https://pytorch.org/tutorials/", "action": "Learn tensors, training loops, and model development."},
+        {"title": "Learn PyTorch", "url": "https://www.learnpytorch.io/", "action": "Follow a practical end-to-end PyTorch learning path."},
+    ],
+    "fastapi": [
+        {"title": "FastAPI Tutorial", "url": "https://fastapi.tiangolo.com/tutorial/", "action": "Build APIs, validation, and routing with FastAPI."},
+        {"title": "FastAPI Docs", "url": "https://fastapi.tiangolo.com/", "action": "Use the official reference while building backend projects."},
+    ],
+    "user research": [
+        {"title": "NNGroup UX Research Methods", "url": "https://www.nngroup.com/topic/user-research/", "action": "Learn core research methods used in design projects."},
+        {"title": "Interaction Design Foundation", "url": "https://www.interaction-design.org/literature/topics/user-research", "action": "Understand how to plan and apply user research."},
+    ],
 }
 
 SECTION_PATTERNS = {
@@ -582,23 +662,68 @@ def prioritize_missing_skills(missing_skills, jd_skills):
 def build_course_recommendations(missing_skills):
     items = []
     for skill in missing_skills[:5]:
-        resources = LEARNING_RESOURCES.get(skill, [f"{skill.title()} roadmap", f"{skill.title()} practical tutorial"])
+        resources = LEARNING_RESOURCES.get(
+            skill,
+            [
+                {
+                    "title": f"{skill.title()} roadmap",
+                    "url": f"https://www.google.com/search?q={skill.replace(' ', '+')}+roadmap",
+                    "action": f"Search for a structured learning path for {skill}.",
+                },
+                {
+                    "title": f"{skill.title()} practical tutorial",
+                    "url": f"https://www.google.com/search?q={skill.replace(' ', '+')}+practical+tutorial",
+                    "action": f"Build one hands-on project around {skill}.",
+                },
+            ],
+        )
         items.append({"skill": skill, "resources": resources})
     return items
 
 
 def build_bullet_improvements(highlights, matched_skills, missing_skills):
     suggestions = []
-    action_skill = matched_skills[0] if matched_skills else "the role's core stack"
-    metric_skill = missing_skills[0] if missing_skills else "business impact"
+    metric_focus = missing_skills[0] if missing_skills else "business impact"
 
-    for line in highlights[:3]:
+    candidate_lines = []
+    for line in highlights:
         cleaned = normalize_whitespace(line)
-        improved = (
-            f"Delivered {action_skill}-driven work that improved product quality or delivery speed, "
-            f"with clear metrics and stronger ownership language around {metric_skill}."
-        )
-        suggestions.append({"before": cleaned, "after": improved})
+        lower = cleaned.lower()
+        if len(cleaned.split()) < 5:
+            continue
+        if re.fullmatch(r"[a-z0-9 .,/()-]+(?:\d{4}.*)?", lower) and not any(char in lower for char in ["%", "built", "develop", "improv", "design", "lead", "implement", "create", "migrat", "optimiz"]):
+            continue
+        if lower.count("github.com") or lower.count("@") or re.search(r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b", lower):
+            continue
+        candidate_lines.append(cleaned)
+
+    def display_skill(skill):
+        special_labels = {
+            "api design": "API design",
+            "rest api": "REST API",
+            "ui/ux": "UI/UX",
+        }
+        return special_labels.get(skill.lower(), skill.title())
+
+    def rewrite_line(line, index):
+        lower = line.lower()
+        line_skills = extract_skills(line)
+        base_skill = line_skills[0] if line_skills else (matched_skills[0] if matched_skills else "core stack")
+        action_skill = display_skill(base_skill)
+        metric_phrase = "improved load time by 30%" if index == 0 else "reduced manual effort and improved delivery quality"
+
+        if "built" in lower or "develop" in lower or "create" in lower:
+            return f"Built and shipped {action_skill}-based features that supported user needs and {metric_phrase}, while documenting clear ownership and outcomes."
+        if "improv" in lower or "optimiz" in lower or "performance" in lower:
+            return f"Optimized the application using {action_skill} practices, {metric_phrase}, and improved the overall user experience."
+        if "migrat" in lower or "refactor" in lower:
+            return f"Refactored and migrated existing features with {action_skill}, making the codebase easier to maintain and creating room to strengthen {metric_focus} coverage."
+        if "design" in lower or "ui" in lower or "ux" in lower:
+            return f"Designed and delivered user-facing interfaces with stronger {action_skill} execution, clearer collaboration, and measurable improvements in usability."
+        return f"Delivered work using {action_skill} that created visible product value, highlighted ownership, and should be rewritten with metrics tied to {metric_focus}."
+
+    for index, line in enumerate(candidate_lines[:3]):
+        suggestions.append({"before": line, "after": rewrite_line(line, index)})
 
     if not suggestions:
         suggestions.append(

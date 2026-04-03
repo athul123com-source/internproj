@@ -748,6 +748,30 @@ textarea {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.resource-links {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.resource-link-card {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.resource-link-card a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.resource-link-card p {
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
 .priority-item span,
 .resource-item strong {
   display: block;

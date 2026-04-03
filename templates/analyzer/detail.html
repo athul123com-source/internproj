@@ -295,11 +295,14 @@
             {% for item in analysis.course_recommendations %}
               <div class="resource-item">
                 <strong>{{ item.skill }}</strong>
-                <ul class="stack-list compact-list">
+                <div class="resource-links">
                   {% for resource in item.resources %}
-                    <li>{{ resource }}</li>
+                    <div class="resource-link-card">
+                      <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer">{{ resource.title }}</a>
+                      <p class="muted">{{ resource.action }}</p>
+                    </div>
                   {% endfor %}
-                </ul>
+                </div>
               </div>
             {% empty %}
               <p class="muted">No course suggestions were needed for this report.</p>

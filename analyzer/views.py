@@ -154,7 +154,10 @@ def export_report(request, run_id):
 
     write_line("Learning Resources", gap=24, bold=True)
     for item in data.get("course_recommendations", [])[:4]:
-        write_line(f"- {item['skill']}: {', '.join(item['resources'])}")
+        write_line(f"- {item['skill']}", bold=True)
+        for resource in item.get("resources", [])[:2]:
+            write_line(f"  {resource['title']}", gap=14)
+            write_line(f"  {resource['url']}", gap=14)
 
     pdf.save()
     response = buffer
