@@ -841,15 +841,122 @@ def build_recommendations(missing_skills):
     return recommendations
 
 
+ROADMAP_PLAYBOOK = {
+    "html": {
+        "mission": "Learn semantic HTML, forms, and accessibility basics, then rebuild one landing page using clean sectioning tags.",
+        "output": "A single-page semantic website with header, main, sections, form, and accessible labels pushed to GitHub.",
+    },
+    "css": {
+        "mission": "Practice layout, spacing, typography, and responsive styling by recreating a polished dashboard screen from scratch.",
+        "output": "A responsive UI clone that demonstrates Flexbox, Grid, spacing, and modern CSS structure.",
+    },
+    "javascript": {
+        "mission": "Strengthen DOM, events, arrays, and async logic by building an interactive app with real user actions.",
+        "output": "A small JavaScript app such as task manager, weather app, or quiz with clean event handling.",
+    },
+    "typescript": {
+        "mission": "Learn types, interfaces, props typing, and API typing by converting one JavaScript project into TypeScript.",
+        "output": "A TypeScript project that uses interfaces, typed components or functions, and zero type errors.",
+    },
+    "react": {
+        "mission": "Build reusable components, state handling, and props flow through a multi-section frontend project.",
+        "output": "A React app with at least 5 reusable components, stateful UI, and deployed demo link.",
+    },
+    "redux": {
+        "mission": "Practice centralized state management by adding Redux Toolkit to a project with shared app state.",
+        "output": "A React project using Redux slices, store setup, and one async or shared-state workflow.",
+    },
+    "tailwind": {
+        "mission": "Learn utility-first styling by converting one existing page into Tailwind with responsive breakpoints.",
+        "output": "A Tailwind-based UI with reusable utility patterns, responsive sections, and polished spacing.",
+    },
+    "vite": {
+        "mission": "Understand modern frontend tooling by creating a project in Vite and managing assets, scripts, and environment setup.",
+        "output": "A Vite-based app scaffolded, run locally, built successfully, and documented in the README.",
+    },
+    "webpack": {
+        "mission": "Learn bundling concepts by setting up entry, output, loaders, and build optimization in a simple project.",
+        "output": "A small project with a working Webpack config, asset handling, and production build command.",
+    },
+    "responsive design": {
+        "mission": "Design mobile-first layouts and test them at common breakpoints using one realistic product page.",
+        "output": "A page that works cleanly on mobile, tablet, and desktop with documented breakpoint decisions.",
+    },
+    "accessibility": {
+        "mission": "Audit one page for keyboard access, labels, color contrast, and semantic structure, then fix the issues.",
+        "output": "An accessibility-improved UI with visible focus states, semantic tags, and a short audit checklist.",
+    },
+    "rest api": {
+        "mission": "Learn request methods, endpoints, and API integration by consuming one public REST API in a project.",
+        "output": "A frontend or backend demo that fetches, displays, and handles API responses or errors correctly.",
+    },
+    "git": {
+        "mission": "Practice commits, branches, merges, and pull-style workflows on a small project repository.",
+        "output": "A GitHub repo with clean commit history, one feature branch, and a merged update.",
+    },
+    "testing": {
+        "mission": "Add basic unit or UI tests to an app and learn assertions, test structure, and failure handling.",
+        "output": "A project with passing tests for at least one component, function, or user flow.",
+    },
+    "figma": {
+        "mission": "Create a simple wireframe and high-fidelity screen for the project before implementation.",
+        "output": "A Figma file with one wireframe, one polished screen, and reusable design components.",
+    },
+    "python": {
+        "mission": "Strengthen Python syntax, functions, and file handling through one practical automation or backend script.",
+        "output": "A Python script or mini project with clean functions and documented usage.",
+    },
+    "django": {
+        "mission": "Build one CRUD feature in Django to practice models, views, templates, forms, and routing.",
+        "output": "A Django module with working create, read, update, and delete flow.",
+    },
+    "postgresql": {
+        "mission": "Practice schema design, queries, and relational modeling by storing real app data in PostgreSQL.",
+        "output": "A PostgreSQL-backed mini app with at least two related tables and basic queries.",
+    },
+    "docker": {
+        "mission": "Containerize one app so it can run consistently with Docker locally or in deployment.",
+        "output": "A Dockerfile and working container run command for your project.",
+    },
+    "machine learning": {
+        "mission": "Learn the ML workflow by preparing data, training a small model, and evaluating the result.",
+        "output": "A notebook or script showing dataset prep, model training, and evaluation metrics.",
+    },
+    "scikit-learn": {
+        "mission": "Train a basic classification or regression model using scikit-learn and explain the pipeline clearly.",
+        "output": "A scikit-learn project with preprocessing, model fitting, and evaluation summary.",
+    },
+    "tensorflow": {
+        "mission": "Build a beginner neural-network project and understand model training, loss, and inference.",
+        "output": "A TensorFlow notebook or script with one trained model and result explanation.",
+    },
+    "pytorch": {
+        "mission": "Practice tensors, datasets, and training loops by building a small PyTorch model.",
+        "output": "A PyTorch project with a working training loop and saved results.",
+    },
+    "fastapi": {
+        "mission": "Create one API endpoint set with validation, routing, and documentation using FastAPI.",
+        "output": "A FastAPI app with working endpoints and Swagger docs.",
+    },
+}
+
+
 def build_learning_roadmap(missing_skills):
     roadmap = []
     for index, skill in enumerate(missing_skills[:6], start=1):
+        plan = ROADMAP_PLAYBOOK.get(
+            skill,
+            {
+                "mission": f"Study the fundamentals of {skill}, then apply it in one small practice project with clear scope.",
+                "output": f"A portfolio-ready mini project or documented learning note for {skill}.",
+            },
+        )
         roadmap.append(
             {
                 "week": f"Week {index}",
                 "focus": skill,
-                "mission": f"Build or document one practical artifact that proves {skill} competence.",
-                "output": f"Portfolio-ready proof for {skill}",
+                "mission": plan["mission"],
+                "output": plan["output"],
             }
         )
     return roadmap

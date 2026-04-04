@@ -20,6 +20,13 @@
           <p class="eyebrow">Account</p>
           <h1 class="page-title">Create account</h1>
         </div>
+        {% if messages %}
+          <div class="message-stack">
+            {% for message in messages %}
+              <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
         <form method="post" class="auth-form">
           {% csrf_token %}
           {{ form.as_p }}

@@ -26,6 +26,12 @@ class ServiceTests(TestCase):
         self.assertTrue(analysis["bullet_improvements"])
         self.assertIn("after", analysis["bullet_improvements"][0])
 
+    def test_learning_roadmap_is_skill_specific(self):
+        analysis = analyze_resume("React Git testing", "frontend-developer", "resume.txt")
+        roadmap = analysis["learning_roadmap"]
+        self.assertTrue(any("TypeScript" in item["output"] or "TypeScript" in item["mission"] for item in roadmap))
+        self.assertTrue(any("Redux Toolkit" in item["output"] or "Redux Toolkit" in item["mission"] for item in roadmap if item["focus"] == "redux"))
+
 
 class ViewFlowTests(TestCase):
     def setUp(self):
@@ -58,6 +64,30 @@ class ViewFlowTests(TestCase):
         )
         self.assertContains(response, "An account with this email already exists.")
 
+    def test_register_rejects_passwords_with_spaces(self):
+        response = self.client.post(
+            reverse("register"),
+            {
+                "username": "space-user",
+                "email": "space@example.com",
+                "password1": "bad pass 123",
+                "password2": "bad pass 123",
+            },
+        )
+        self.assertContains(response, "Password cannot contain spaces.")
+
+    def test_register_rejects_duplicate_username_case_insensitive(self):
+        response = self.client.post(
+            reverse("register"),
+            {
+                "username": "ATHUL",
+                "email": "new@example.com",
+                "password1": "StrongPass123",
+                "password2": "StrongPass123",
+            },
+        )
+        self.assertContains(response, "This username is already taken.")
+
     def test_profile_page_creates_and_updates_profile(self):
         self.login()
         response = self.client.post(
@@ -76,6 +106,12 @@ class ViewFlowTests(TestCase):
         profile = UserProfile.objects.get(user=self.user)
         self.assertEqual(profile.full_name, "Athul Pradeep")
         self.assertContains(response, "Profile updated successfully.")
+
+    def test_logout_url_redirects_cleanly(self):
+        self.login()
+        response = self.client.get(reverse("logout"), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "logged out successfully")
 
     def test_upload_creates_analysis_and_history_filters_work(self):
         self.login()

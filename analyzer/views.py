@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -172,6 +172,13 @@ def register(request):
         messages.success(request, "Account created. Your future analyses will be saved to your dashboard.")
         return redirect("upload")
     return render(request, "registration/register.html", {"form": form})
+
+
+def logout_view(request):
+    if request.user.is_authenticated:
+        logout(request)
+        messages.success(request, "You have been logged out successfully.")
+    return redirect("login")
 
 
 @login_required
