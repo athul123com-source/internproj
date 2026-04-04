@@ -241,6 +241,102 @@ SECTION_PATTERNS = {
 }
 
 
+LEARNING_RESOURCES = {
+    "html": [
+        {"title": "HTML roadmap", "url": "https://roadmap.sh/html", "action": "Follow the full HTML learning roadmap step by step."},
+        {"title": "MDN HTML course", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content", "action": "Work through the MDN HTML learning path with examples."},
+    ],
+    "css": [
+        {"title": "CSS roadmap", "url": "https://roadmap.sh/css", "action": "Use the CSS roadmap to cover layout, selectors, and advanced topics."},
+        {"title": "MDN CSS guide", "url": "https://developer.mozilla.org/en-US/docs/Web/CSS", "action": "Learn CSS fundamentals and reference real properties quickly."},
+    ],
+    "javascript": [
+        {"title": "JavaScript roadmap", "url": "https://roadmap.sh/javascript", "action": "Follow the JavaScript roadmap in the correct order."},
+        {"title": "javascript.info course", "url": "https://javascript.info/", "action": "Study JavaScript from basics to advanced topics with examples."},
+    ],
+    "typescript": [
+        {"title": "TypeScript roadmap", "url": "https://roadmap.sh/typescript", "action": "Follow the TypeScript roadmap from basics to advanced usage."},
+        {"title": "TypeScript handbook", "url": "https://www.typescriptlang.org/docs/", "action": "Learn TypeScript directly from the official handbook."},
+    ],
+    "react": [
+        {"title": "React roadmap", "url": "https://roadmap.sh/react", "action": "Use the React roadmap to learn the ecosystem in order."},
+        {"title": "React official course", "url": "https://react.dev/learn", "action": "Study components, state, effects, and React patterns."},
+    ],
+    "redux": [
+        {"title": "Redux essentials tutorial", "url": "https://redux.js.org/tutorials/essentials/part-1-overview-concepts", "action": "Learn Redux with the official end-to-end tutorial."},
+        {"title": "Redux Toolkit quick start", "url": "https://redux-toolkit.js.org/tutorials/quick-start", "action": "Set up and use the modern Redux Toolkit workflow."},
+    ],
+    "tailwind": [
+        {"title": "Tailwind CSS docs", "url": "https://tailwindcss.com/docs", "action": "Learn utility classes, styling patterns, and customization."},
+        {"title": "Tailwind installation guide", "url": "https://tailwindcss.com/docs/installation", "action": "Set up Tailwind correctly in a project and start practicing."},
+    ],
+    "vite": [
+        {"title": "Vite official guide", "url": "https://vite.dev/guide/", "action": "Learn how to scaffold, run, and build apps with Vite."},
+        {"title": "Vite features guide", "url": "https://vite.dev/guide/features.html", "action": "Understand assets, env files, and the dev workflow."},
+    ],
+    "responsive design": [
+        {"title": "Responsive design course", "url": "https://web.dev/learn/design", "action": "Study breakpoints, fluid layouts, and mobile-first design."},
+        {"title": "MDN responsive design", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Responsive_Design", "action": "Practice media queries and responsive CSS techniques."},
+    ],
+    "accessibility": [
+        {"title": "W3C accessibility introduction", "url": "https://www.w3.org/WAI/fundamentals/accessibility-intro/", "action": "Learn core accessibility principles and why they matter."},
+        {"title": "MDN accessibility guide", "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility", "action": "Apply keyboard, semantic, and assistive-technology-friendly practices."},
+    ],
+    "rest api": [
+        {"title": "REST API tutorial", "url": "https://restfulapi.net/", "action": "Learn REST methods, status codes, and API design basics."},
+        {"title": "MDN REST guide", "url": "https://developer.mozilla.org/en-US/docs/Glossary/REST", "action": "Understand what REST means and how web APIs are designed."},
+    ],
+    "git": [
+        {"title": "Pro Git book", "url": "https://git-scm.com/book/en/v2", "action": "Learn commits, branches, merges, and collaboration workflows."},
+        {"title": "Git documentation", "url": "https://git-scm.com/docs", "action": "Use the official documentation for exact commands and concepts."},
+    ],
+    "testing": [
+        {"title": "Jest getting started", "url": "https://jestjs.io/docs/getting-started", "action": "Learn unit testing and configure a frontend test setup."},
+        {"title": "Testing Library docs", "url": "https://testing-library.com/docs/", "action": "Practice user-focused testing patterns used in real apps."},
+    ],
+    "figma": [
+        {"title": "Figma design basics", "url": "https://www.figma.com/resource-library/design-basics/", "action": "Learn UI basics, layouts, and design workflow in Figma."},
+        {"title": "Figma help center", "url": "https://help.figma.com/hc/en-us", "action": "Use the official Figma help center to learn tools and features."},
+    ],
+    "python": [
+        {"title": "Python roadmap", "url": "https://roadmap.sh/python", "action": "Follow the roadmap for learning Python in the right sequence."},
+        {"title": "Python docs tutorial", "url": "https://docs.python.org/3/tutorial/", "action": "Learn Python directly from the official tutorial."},
+    ],
+    "django": [
+        {"title": "Django roadmap", "url": "https://roadmap.sh/django", "action": "Use the Django roadmap to understand the backend stack."},
+        {"title": "Django tutorial", "url": "https://docs.djangoproject.com/en/stable/intro/tutorial01/", "action": "Build a Django app and learn views, models, and routing."},
+    ],
+    "postgresql": [
+        {"title": "PostgreSQL roadmap", "url": "https://roadmap.sh/postgresql", "action": "Follow a guided roadmap for PostgreSQL concepts and usage."},
+        {"title": "PostgreSQL tutorial", "url": "https://www.postgresql.org/docs/current/tutorial.html", "action": "Learn SQL queries and PostgreSQL basics from the official docs."},
+    ],
+    "docker": [
+        {"title": "Docker roadmap", "url": "https://roadmap.sh/docker", "action": "Use the Docker roadmap to learn containers in sequence."},
+        {"title": "Docker getting started", "url": "https://docs.docker.com/get-started/", "action": "Learn images, containers, and the Docker workflow."},
+    ],
+    "machine learning": [
+        {"title": "Machine learning roadmap", "url": "https://roadmap.sh/ai-data-scientist", "action": "Use the AI and data roadmap to structure ML learning."},
+        {"title": "Google ML crash course", "url": "https://developers.google.com/machine-learning/crash-course", "action": "Study ML fundamentals with Google's guided course."},
+    ],
+    "scikit-learn": [
+        {"title": "scikit-learn user guide", "url": "https://scikit-learn.org/stable/user_guide.html", "action": "Learn preprocessing, models, and evaluation in sklearn."},
+        {"title": "scikit-learn tutorials", "url": "https://scikit-learn.org/stable/tutorial/index.html", "action": "Work through example-driven sklearn tutorials."},
+    ],
+    "tensorflow": [
+        {"title": "TensorFlow tutorials", "url": "https://www.tensorflow.org/tutorials", "action": "Learn TensorFlow using guided official tutorials."},
+        {"title": "TensorFlow guide", "url": "https://www.tensorflow.org/guide", "action": "Study the main TensorFlow workflow in depth."},
+    ],
+    "pytorch": [
+        {"title": "PyTorch tutorials", "url": "https://pytorch.org/tutorials/", "action": "Learn tensors, training loops, and model building."},
+        {"title": "Learn PyTorch", "url": "https://www.learnpytorch.io/", "action": "Follow a practical end-to-end PyTorch learning path."},
+    ],
+    "fastapi": [
+        {"title": "FastAPI tutorial", "url": "https://fastapi.tiangolo.com/tutorial/", "action": "Learn API building with the official FastAPI tutorial."},
+        {"title": "FastAPI docs", "url": "https://fastapi.tiangolo.com/", "action": "Use the official reference while building backend projects."},
+    ],
+}
+
+
 def normalize_whitespace(text):
     return re.sub(r"\s+", " ", text).strip()
 
@@ -564,27 +660,24 @@ def prioritize_missing_skills(missing_skills, jd_skills):
     return priorities
 
 
-def build_learning_links(skill):
-    query = skill.replace(" ", "+")
-    readable = skill.title()
-    return [
-        {
-            "title": f"{readable} YouTube learning path",
-            "url": f"https://www.youtube.com/results?search_query={query}+full+course",
-            "action": f"Open a YouTube full-course search and pick one structured course for {skill}.",
-        },
-        {
-            "title": f"{readable} roadmap / PDF search",
-            "url": f"https://www.google.com/search?q={query}+roadmap+pdf",
-            "action": f"Open a roadmap or PDF-style learning path for {skill} and follow it step by step.",
-        },
-    ]
-
-
 def build_course_recommendations(missing_skills):
     items = []
     for skill in missing_skills[:5]:
-        resources = build_learning_links(skill)
+        resources = LEARNING_RESOURCES.get(
+            skill,
+            [
+                {
+                    "title": f"{skill.title()} roadmap",
+                    "url": "https://roadmap.sh",
+                    "action": f"Open roadmap.sh and search for a structured path for {skill}.",
+                },
+                {
+                    "title": f"{skill.title()} official guide",
+                    "url": "https://developer.mozilla.org/",
+                    "action": f"Use the official documentation path for {skill}.",
+                },
+            ],
+        )
         items.append({"skill": skill, "resources": resources})
     return items
 
