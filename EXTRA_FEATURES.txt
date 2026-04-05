@@ -1,4 +1,4 @@
-Resume Analyzer Studio - Future Feature Ideas
+Resume Insight Studio - Future Feature Ideas
 
 1. Job description based analysis
    Let the user paste a job description and compare the resume against that exact role.

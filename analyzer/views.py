@@ -126,7 +126,7 @@ def export_report(request, run_id):
         pdf.drawString(40, y, text[:110])
         y -= gap
 
-    write_line("Resume Analyzer Studio Report", size=16, gap=26, bold=True)
+    write_line("Resume Insight Studio Report", size=16, gap=26, bold=True)
     write_line(f"Filename: {run.filename}")
     write_line(f"Role: {run.role}")
     write_line(f"Resume Score: {run.resume_score}%")

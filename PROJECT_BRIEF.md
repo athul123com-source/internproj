@@ -1,8 +1,8 @@
-# AI Resume Analyzer Studio
+# Resume Insight Studio
 
 ## Complete Project Explanation
 
-AI Resume Analyzer Studio is a web-based application developed using Python and Django. The purpose of the project is to help users evaluate their resumes for specific job roles such as Frontend Developer, Backend Developer, Data Scientist, ML Engineer, and UI/UX Designer. The system analyzes the uploaded resume, extracts its text content, compares it with the selected role requirements, and then generates a detailed report showing how well the resume matches that role.
+Resume Insight Studio is a web-based application developed using Python and Django. The purpose of the project is to help users evaluate their resumes for specific job roles such as Frontend Developer, Backend Developer, Data Scientist, ML Engineer, and UI/UX Designer. The system analyzes the uploaded resume, extracts its text content, compares it with the selected role requirements, and then generates a detailed report showing how well the resume matches that role.
 
 The project is designed to solve a common problem faced by students and job seekers. Many people create resumes without knowing whether the content is actually aligned with the job they want. A resume may look good visually, but it can still miss important skills, proper structure, ATS-friendly keywords, or measurable achievements. This project helps identify those issues and gives practical improvement suggestions.
 
@@ -240,4 +240,4 @@ The project is deployed on Render so it can be accessed through a public link. S
 
 ## Conclusion
 
-AI Resume Analyzer Studio is a complete Django-based resume analysis platform that helps users understand how well their resume matches a chosen job role. It combines authentication, file upload, text extraction, skill matching, ATS scoring, section-wise analysis, roadmap generation, recommendations, report storage, and deployment into one practical project. It is a strong college project because it solves a real problem, uses multiple technologies together, and demonstrates both technical development and real-world usefulness.
+Resume Insight Studio is a complete Django-based resume analysis platform that helps users understand how well their resume matches a chosen job role. It combines authentication, file upload, text extraction, skill matching, ATS scoring, section-wise analysis, roadmap generation, recommendations, report storage, and deployment into one practical project. It is a strong college project because it solves a real problem, uses multiple technologies together, and demonstrates both technical development and real-world usefulness.

@@ -1,6 +1,6 @@
-# Resume Analyzer Studio
+# Resume Insight Studio
 
-Resume Analyzer Studio is a Django-based resume analysis project inspired by the `AI_Resume_Analyzer_Project.pdf` brief. It evaluates uploaded resumes against a selected role, shows skill gaps, estimates ATS readiness, and generates a practical improvement roadmap inside a modern glassmorphism dashboard.
+Resume Insight Studio is a Django-based resume analysis project inspired by the `AI_Resume_Analyzer_Project.pdf` brief. It evaluates uploaded resumes against a selected role, shows skill gaps, estimates ATS readiness, and generates a practical improvement roadmap inside a modern glassmorphism dashboard.
 
 ## Features
 
