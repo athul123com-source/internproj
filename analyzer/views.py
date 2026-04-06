@@ -4,12 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Q
+from django.views.decorators.http import require_POST
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
 from .forms import ProfileForm, RegisterForm, ResumeUploadForm
 from .models import AnalysisRun, UserProfile
-from .services import analyze_resume, extract_resume_text
+from .services import analyze_resume, apply_learning_progress, extract_resume_text
 
 
 def home(request):
@@ -106,8 +107,38 @@ def detail(request, run_id):
     run = get_object_or_404(AnalysisRun, id=run_id)
     if run.owner != request.user:
         raise Http404("This dashboard is not available.")
-    analysis = run.analysis_data or None
+    analysis = apply_learning_progress(run.analysis_data or {})
     return render(request, "analyzer/detail.html", {"analysis": analysis, "run": run})
+
+
+@login_required
+@require_POST
+def toggle_skill_completion(request, run_id):
+    run = get_object_or_404(AnalysisRun, id=run_id)
+    if run.owner != request.user:
+        raise Http404("This dashboard is not available.")
+
+    skill = request.POST.get("skill", "").strip().lower()
+    analysis = run.analysis_data or {}
+    missing_skills = analysis.get("all_missing_skills") or analysis.get("missing_skills", [])
+    if skill not in missing_skills:
+        messages.error(request, "That skill is not available for progress tracking on this report.")
+        return redirect("detail", run_id=run.id)
+
+    completed_skills = set(analysis.get("completed_skills", []))
+    if skill in completed_skills:
+        completed_skills.remove(skill)
+        messages.success(request, f"Marked {skill} as not completed yet.")
+    else:
+        completed_skills.add(skill)
+        messages.success(request, f"Marked {skill} as completed. Your progress score has been updated.")
+
+    analysis["completed_skills"] = sorted(completed_skills)
+    analysis = apply_learning_progress(analysis)
+    run.analysis_data = analysis
+    run.resume_score = analysis.get("resume_score", run.resume_score)
+    run.save(update_fields=["analysis_data", "resume_score"])
+    return redirect("detail", run_id=run.id)
 
 
 @login_required

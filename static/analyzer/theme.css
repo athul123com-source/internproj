@@ -416,6 +416,26 @@ textarea:focus,
   font-weight: 700;
 }
 
+.progress-form {
+  margin-top: 14px;
+}
+
+.progress-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.chip-form {
+  margin: 0;
+}
+
+.chip-button {
+  cursor: pointer;
+  font: inherit;
+}
+
 @media (max-width: 720px) {
   .topbar,
   .history-item,

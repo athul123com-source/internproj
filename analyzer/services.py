@@ -338,6 +338,107 @@ LEARNING_RESOURCES = {
     ],
 }
 
+YOUTUBE_COURSES = {
+    "html": [
+        {
+            "title": "HTML & CSS full beginner course",
+            "url": "https://www.youtube.com/watch?v=G3e-cpL7ofc",
+            "action": "Watch the HTML sections first, then rebuild one semantic landing page with forms and headings.",
+        },
+    ],
+    "css": [
+        {
+            "title": "HTML & CSS full beginner course",
+            "url": "https://www.youtube.com/watch?v=G3e-cpL7ofc",
+            "action": "Use the CSS sections to practice spacing, layout, typography, and responsive structure.",
+        },
+    ],
+    "javascript": [
+        {
+            "title": "JavaScript full beginner course",
+            "url": "https://www.youtube.com/watch?v=EerdGm-ehJQ",
+            "action": "Follow the full JavaScript course and build one interactive project while learning.",
+        },
+    ],
+    "typescript": [
+        {
+            "title": "Practical TypeScript for beginners",
+            "url": "https://www.youtube.com/watch?v=JHEB7RhJG1Y",
+            "action": "Complete the TypeScript course and convert one JavaScript app to typed code.",
+        },
+    ],
+    "react": [
+        {
+            "title": "React course for beginners",
+            "url": "https://www.youtube.com/watch?v=ZXIN4i_xJ6Q",
+            "action": "Finish the React course and ship a component-based mini app.",
+        },
+    ],
+    "redux": [
+        {
+            "title": "Redux Toolkit playlist",
+            "url": "https://www.youtube.com/playlist?list=PL0Zuz27SZ-6M1J5I1w2-uZx36Qp6qhjKo",
+            "action": "Work through the Redux Toolkit playlist and wire shared state into a React app.",
+        },
+    ],
+    "git": [
+        {
+            "title": "Git and GitHub full course",
+            "url": "https://www.youtube.com/watch?v=RGOj5yH7evk",
+            "action": "Learn commits, branches, merges, and GitHub workflow with the full beginner course.",
+        },
+    ],
+    "tailwind": [
+        {
+            "title": "Tailwind CSS tutorial series",
+            "url": "https://www.youtube.com/@NetNinja/playlists",
+            "action": "Open the Net Ninja playlists page and complete the Tailwind CSS tutorial series.",
+        },
+    ],
+    "vite": [
+        {
+            "title": "Vite beginner tutorial path",
+            "url": "https://www.youtube.com/@HiteshCodeLab/playlists",
+            "action": "Use the Hitesh Choudhary playlists to complete a Vite setup tutorial and ship one build.",
+        },
+    ],
+    "responsive design": [
+        {
+            "title": "Responsive web design course",
+            "url": "https://www.youtube.com/@freecodecamp/videos",
+            "action": "Open freeCodeCamp's channel and complete one responsive web design course or long tutorial.",
+        },
+    ],
+    "accessibility": [
+        {
+            "title": "Web accessibility learning playlist",
+            "url": "https://www.youtube.com/@GoogleChromeDevelopers/videos",
+            "action": "Use the Chrome Developers channel and complete the accessibility-focused lessons before auditing your UI.",
+        },
+    ],
+    "rest api": [
+        {
+            "title": "REST API beginner course",
+            "url": "https://www.youtube.com/@HiteshCodeLab/videos",
+            "action": "Complete one beginner REST API tutorial and connect a public API inside a small project.",
+        },
+    ],
+    "testing": [
+        {
+            "title": "Frontend testing tutorial path",
+            "url": "https://www.youtube.com/@freecodecamp/videos",
+            "action": "Pick one Jest or Testing Library beginner course from freeCodeCamp and add tests to a project.",
+        },
+    ],
+    "figma": [
+        {
+            "title": "Figma beginner playlist",
+            "url": "https://www.youtube.com/results?search_query=figma+for+beginners+freecodecamp",
+            "action": "Complete one beginner-friendly Figma course and recreate a polished UI screen.",
+        },
+    ],
+}
+
 
 def normalize_whitespace(text):
     return re.sub(r"\s+", " ", text).strip()
@@ -575,7 +676,7 @@ def analyze_resume(text, role_key, filename, job_description="", raw_file_bytes=
         ai_readiness["provider"] = ai_result["provider"]
         ai_readiness["model"] = ai_result["model"]
 
-    return {
+    analysis = {
         "filename": filename,
         "role": role["title"],
         "role_summary": role["summary"],
@@ -588,7 +689,9 @@ def analyze_resume(text, role_key, filename, job_description="", raw_file_bytes=
         "ats_score": ats["score"],
         "experience_level": experience_level,
         "matched_skills": matched_skills,
+        "all_missing_skills": missing_skills,
         "missing_skills": missing_skills,
+        "completed_skills": [],
         "prioritized_gaps": prioritized_gaps,
         "section_scores": section_scores,
         "course_recommendations": course_recommendations,
@@ -605,7 +708,11 @@ def analyze_resume(text, role_key, filename, job_description="", raw_file_bytes=
         "ai_summary": ai_result["summary"],
         "ai_learning_roadmap": ai_result["roadmap"],
         "ai_error": ai_result["error"],
+        "jd_skills": jd_analysis["jd_skills"],
+        "base_resume_score": resume_score,
+        "base_match_rate": match_rate,
     }
+    return apply_learning_progress(analysis)
 
 
 def tokenize_text(text):
@@ -727,13 +834,13 @@ def prioritize_missing_skills(missing_skills, jd_skills):
 def build_course_recommendations(missing_skills):
     items = []
     for skill in missing_skills[:5]:
-        resources = LEARNING_RESOURCES.get(
+        resources = YOUTUBE_COURSES.get(skill) or LEARNING_RESOURCES.get(
             skill,
             [
                 {
-                    "title": f"{skill.title()} roadmap",
-                    "url": "https://roadmap.sh",
-                    "action": f"Open roadmap.sh and search for a structured path for {skill}.",
+                    "title": f"{skill.title()} learning path",
+                    "url": f"https://www.youtube.com/results?search_query={skill.replace(' ', '+')}+full+course",
+                    "action": f"Open a structured beginner-friendly video path for {skill} and complete one hands-on project.",
                 },
                 {
                     "title": f"{skill.title()} official guide",
@@ -744,6 +851,51 @@ def build_course_recommendations(missing_skills):
         )
         items.append({"skill": skill, "resources": resources})
     return items
+
+
+def apply_learning_progress(analysis):
+    completed_skills = sorted({skill for skill in analysis.get("completed_skills", []) if skill})
+    original_missing = analysis.get("all_missing_skills") or analysis.get("missing_skills", [])
+    matched_skills = analysis.get("matched_skills", [])
+    remaining_missing = [skill for skill in original_missing if skill not in completed_skills]
+    completed_relevant = [skill for skill in completed_skills if skill in original_missing]
+    total_target_skills = len(matched_skills) + len(original_missing)
+
+    projected_match_rate = analysis.get("base_match_rate", analysis.get("match_rate", 0))
+    if total_target_skills:
+        projected_match_rate = round(((len(matched_skills) + len(completed_relevant)) / total_target_skills) * 100)
+
+    projected_rule_score = round(projected_match_rate * 0.6 + analysis.get("ats_score", 0) * 0.4)
+    ai_score = analysis.get("ai_score")
+    if ai_score is not None:
+        projected_resume_score = max(
+            analysis.get("base_resume_score", analysis.get("resume_score", 0)),
+            round(projected_rule_score * 0.55 + ai_score * 0.45),
+        )
+    else:
+        projected_resume_score = max(
+            analysis.get("base_resume_score", analysis.get("resume_score", 0)),
+            projected_rule_score,
+        )
+
+    ai_learning_roadmap = analysis.get("ai_learning_roadmap") or []
+    roadmap = []
+    if ai_learning_roadmap:
+        roadmap = [item for item in ai_learning_roadmap if item.get("focus") not in completed_relevant]
+    if not roadmap:
+        roadmap = build_learning_roadmap(remaining_missing)
+
+    analysis["completed_skills"] = completed_relevant
+    analysis["missing_skills"] = remaining_missing
+    analysis["prioritized_gaps"] = prioritize_missing_skills(remaining_missing, analysis.get("jd_skills", []))
+    analysis["learning_roadmap"] = roadmap
+    analysis["course_recommendations"] = build_course_recommendations(remaining_missing)
+    analysis["match_rate"] = projected_match_rate
+    analysis["resume_score"] = projected_resume_score
+    analysis["score_gain"] = projected_resume_score - analysis.get("base_resume_score", projected_resume_score)
+    analysis["match_gain"] = projected_match_rate - analysis.get("base_match_rate", projected_match_rate)
+    analysis["score_mode"] = analysis.get("score_mode", "Rule-based")
+    return analysis
 
 
 def build_bullet_improvements(highlights, matched_skills, missing_skills):

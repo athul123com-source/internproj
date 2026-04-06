@@ -80,6 +80,19 @@ OPENAI_API_KEY=your-openai-key
 
 If the AI request fails or is not configured, the app falls back to the existing rule-based score and roadmap.
 
+For a lower-cost/free-compatible option, you can switch to Groq with:
+
+```bash
+AI_PROVIDER=groq
+AI_MODEL=llama-3.3-70b-versatile
+AI_PDF_REVIEW_ENABLED=False
+AI_SCORING_ENABLED=True
+AI_PLANNING_ENABLED=True
+GROQ_API_KEY=your-groq-api-key
+```
+
+The dashboard also supports skill completion tracking. When a learner marks a missing skill as completed, the report updates the projected role match and resume score for that saved dashboard.
+
 See [SHARE_DEPLOYMENT.txt](/d:/Intern/SHARE_DEPLOYMENT.txt) for a simple deployment guide.
 
 ## Notes

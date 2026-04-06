@@ -8,7 +8,7 @@ from django.urls import reverse
 from docx import Document
 
 from .models import AnalysisRun, UserProfile
-from .services import analyze_resume, extract_skills
+from .services import analyze_resume, apply_learning_progress, extract_skills
 
 
 class ServiceTests(TestCase):
@@ -82,6 +82,15 @@ class ServiceTests(TestCase):
         self.assertEqual(analysis["score_mode"], "Hybrid AI + Rule-based")
         self.assertEqual(analysis["learning_roadmap"][0]["focus"], "typescript")
         self.assertIn("portfolio evidence", " ".join(analysis["warnings"]).lower())
+
+    def test_learning_progress_increases_score_when_skill_is_completed(self):
+        analysis = analyze_resume("React Git testing", "frontend-developer", "resume.txt")
+        base_score = analysis["resume_score"]
+        analysis["completed_skills"] = ["html"]
+        progressed = apply_learning_progress(analysis)
+        self.assertGreater(progressed["resume_score"], base_score)
+        self.assertIn("html", progressed["completed_skills"])
+        self.assertNotIn("html", progressed["missing_skills"])
 
 
 class ViewFlowTests(TestCase):
@@ -185,3 +194,22 @@ class ViewFlowTests(TestCase):
 
         history_response = self.client.get(reverse("history"), {"role": "Frontend Developer", "min_score": "50"})
         self.assertContains(history_response, run.filename)
+
+    def test_marking_skill_completed_updates_saved_score(self):
+        self.login()
+        run = AnalysisRun.objects.create(
+            owner=self.user,
+            role="Frontend Developer",
+            filename="resume.txt",
+            resume_score=63,
+            analysis_data=analyze_resume("React Git testing", "frontend-developer", "resume.txt"),
+        )
+        response = self.client.post(
+            reverse("toggle_skill_completion", args=[run.id]),
+            {"skill": "html"},
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        run.refresh_from_db()
+        self.assertIn("html", run.analysis_data["completed_skills"])
+        self.assertGreater(run.resume_score, run.analysis_data["base_resume_score"])

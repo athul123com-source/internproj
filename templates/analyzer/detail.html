@@ -44,6 +44,9 @@
           <p class="muted">{{ analysis.role_summary }}</p>
           <p class="muted">{{ analysis.job_description_summary }}</p>
           <p class="muted">Scoring mode: {{ analysis.score_mode }}</p>
+          {% if analysis.score_gain > 0 %}
+            <p class="muted">Learning progress uplift: +{{ analysis.score_gain }} score points and +{{ analysis.match_gain }} role-match points.</p>
+          {% endif %}
         </div>
         <div class="summary-meta">
           <div>
@@ -151,7 +154,9 @@
             <div class="donut" style="--value: {{ analysis.match_rate }};">
               <span>{{ analysis.match_rate }}%</span>
             </div>
-            <p class="muted">Current role-skill coverage based on extracted resume signals.</p>
+            <p class="muted">
+              Role-skill coverage based on extracted resume signals{% if analysis.completed_skills %} plus skills you marked as completed{% endif %}.
+            </p>
           </div>
         </article>
       </section>
@@ -181,6 +186,24 @@
               <span class="chip missing">{{ skill }}</span>
             {% empty %}
               <span class="chip">None</span>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="glass-card insight-card">
+          <div class="section-heading compact">
+            <p class="eyebrow">Progress</p>
+            <h3>Completed learning</h3>
+          </div>
+          <div class="chip-row">
+            {% for skill in analysis.completed_skills %}
+              <form method="post" action="{% url 'toggle_skill_completion' run.id %}" class="chip-form">
+                {% csrf_token %}
+                <input type="hidden" name="skill" value="{{ skill }}" />
+                <button type="submit" class="chip good chip-button">{{ skill }} · undo</button>
+              </form>
+            {% empty %}
+              <span class="chip">No skills marked complete yet</span>
             {% endfor %}
           </div>
         </article>
@@ -324,7 +347,7 @@
         <article class="glass-card wide-card">
           <div class="section-heading compact">
             <p class="eyebrow">Learning Links</p>
-            <h3>Recommended resources</h3>
+            <h3>Recommended learning paths</h3>
           </div>
           <div class="resource-list">
             {% for item in analysis.course_recommendations %}
@@ -338,6 +361,15 @@
                     </a>
                   {% endfor %}
                 </div>
+                <form method="post" action="{% url 'toggle_skill_completion' run.id %}" class="progress-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="skill" value="{{ item.skill }}" />
+                  {% if item.skill in analysis.completed_skills %}
+                    <button type="submit" class="ghost-link progress-toggle">Mark as not completed</button>
+                  {% else %}
+                    <button type="submit" class="ghost-link progress-toggle">Mark course completed</button>
+                  {% endif %}
+                </form>
               </div>
             {% empty %}
               <p class="muted">No course suggestions were needed for this report.</p>

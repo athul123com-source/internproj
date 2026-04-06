@@ -10,10 +10,11 @@ def _env_flag(name):
 
 def get_ai_runtime_config():
     provider = os.getenv("AI_PROVIDER", "disabled").strip().lower() or "disabled"
-    model = os.getenv("AI_MODEL", "").strip() or "gpt-5-mini"
+    model = os.getenv("AI_MODEL", "").strip() or ("llama-3.3-70b-versatile" if provider == "groq" else "gpt-5-mini")
     pdf_model = os.getenv("AI_PDF_MODEL", "").strip() or "gpt-5"
     api_key_present = bool(
         os.getenv("OPENAI_API_KEY", "").strip()
+        or os.getenv("GROQ_API_KEY", "").strip()
         or os.getenv("AI_API_KEY", "").strip()
     )
     return {
@@ -265,7 +266,7 @@ def generate_ai_resume_insights(
         "error": "",
     }
 
-    if config["provider"] != "openai":
+    if config["provider"] not in {"openai", "groq"}:
         result["status"] = "provider_not_enabled"
         return result
     if not config["api_key_present"]:
@@ -282,59 +283,77 @@ def generate_ai_resume_insights(
         result["error"] = "OpenAI SDK is not installed on this runtime."
         return result
 
-    model = config["pdf_model"] if config["pdf_review_enabled"] and filename.lower().endswith(".pdf") and raw_file_bytes else config["model"]
-    user_content = [
-        {
-            "type": "input_text",
-            "text": _build_user_prompt(
-                role_title=role_title,
-                role_summary=role_summary,
-                job_description=job_description,
-                extracted_text=extracted_text,
-                filename=filename,
-                matched_skills=matched_skills,
-                missing_skills=missing_skills,
-                rule_score=rule_score,
-                match_rate=match_rate,
-                ats_score=ats_score,
-            ),
+    user_prompt = _build_user_prompt(
+        role_title=role_title,
+        role_summary=role_summary,
+        job_description=job_description,
+        extracted_text=extracted_text,
+        filename=filename,
+        matched_skills=matched_skills,
+        missing_skills=missing_skills,
+        rule_score=rule_score,
+        match_rate=match_rate,
+        ats_score=ats_score,
+    )
+
+    client_kwargs = {}
+    if config["provider"] == "groq":
+        client_kwargs = {
+            "base_url": "https://api.groq.com/openai/v1",
+            "api_key": os.getenv("GROQ_API_KEY", "").strip() or os.getenv("AI_API_KEY", "").strip(),
         }
-    ]
-
-    if config["pdf_review_enabled"] and filename.lower().endswith(".pdf") and raw_file_bytes:
-        encoded_pdf = base64.b64encode(raw_file_bytes).decode("utf-8")
-        user_content.insert(
-            0,
-            {
-                "type": "input_file",
-                "filename": filename,
-                "file_data": f"data:application/pdf;base64,{encoded_pdf}",
-            },
-        )
-
-    client = OpenAI()
+    client = OpenAI(**client_kwargs)
 
     try:
-        response = client.responses.create(
-            model=model,
-            input=[
+        if config["provider"] == "groq":
+            model = config["model"]
+            completion = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": _build_system_prompt()},
+                    {"role": "user", "content": user_prompt},
+                ],
+                response_format={"type": "json_object"},
+            )
+            parsed = json.loads(completion.choices[0].message.content)
+        else:
+            model = config["pdf_model"] if config["pdf_review_enabled"] and filename.lower().endswith(".pdf") and raw_file_bytes else config["model"]
+            user_content = [
                 {
-                    "role": "system",
-                    "content": [{"type": "input_text", "text": _build_system_prompt()}],
-                },
-                {
-                    "role": "user",
-                    "content": user_content,
-                },
-            ],
-            text={
-                "format": {
-                    "type": "json_schema",
-                    **_resume_analysis_schema(),
+                    "type": "input_text",
+                    "text": user_prompt,
                 }
-            },
-        )
-        parsed = json.loads(response.output_text)
+            ]
+            if config["pdf_review_enabled"] and filename.lower().endswith(".pdf") and raw_file_bytes:
+                encoded_pdf = base64.b64encode(raw_file_bytes).decode("utf-8")
+                user_content.insert(
+                    0,
+                    {
+                        "type": "input_file",
+                        "filename": filename,
+                        "file_data": f"data:application/pdf;base64,{encoded_pdf}",
+                    },
+                )
+            response = client.responses.create(
+                model=model,
+                input=[
+                    {
+                        "role": "system",
+                        "content": [{"type": "input_text", "text": _build_system_prompt()}],
+                    },
+                    {
+                        "role": "user",
+                        "content": user_content,
+                    },
+                ],
+                text={
+                    "format": {
+                        "type": "json_schema",
+                        **_resume_analysis_schema(),
+                    }
+                },
+            )
+            parsed = json.loads(response.output_text)
     except Exception as error:
         result["status"] = "request_failed"
         result["error"] = str(error)
