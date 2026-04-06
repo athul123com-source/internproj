@@ -15,24 +15,66 @@
       <div class="grid-glow"></div>
     </div>
     <main class="shell auth-shell">
-      <section class="glass-card auth-card">
-        <div class="section-heading">
-          <p class="eyebrow">Account</p>
-          <h1 class="page-title">Create account</h1>
-        </div>
-        {% if messages %}
-          <div class="message-stack">
-            {% for message in messages %}
-              <div class="message {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
+      <section class="auth-layout">
+        <article class="glass-card auth-showcase">
+          <div class="auth-showcase-copy">
+            <p class="eyebrow">Resume Insight Studio</p>
+            <h1 class="page-title">Build a career dashboard around every resume you analyze.</h1>
+            <p class="muted">
+              Create your account to save reports, track completed skills, and keep improving your role readiness over time.
+            </p>
           </div>
-        {% endif %}
-        <form method="post" class="auth-form">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit" class="primary-button">Create account</button>
-        </form>
-        <p class="muted auth-note">Already have one? <a href="{% url 'login' %}">Login</a></p>
+          <div class="auth-feature-stack">
+            <div class="auth-feature-card">
+              <strong>Saved dashboards</strong>
+              <span>Keep each role analysis, resume score, and skill-gap report in one place.</span>
+            </div>
+            <div class="auth-feature-card">
+              <strong>Better resources</strong>
+              <span>Use guided YouTube-first learning paths instead of random scattered links.</span>
+            </div>
+            <div class="auth-feature-card">
+              <strong>AI-ready analysis</strong>
+              <span>Upgrade into hybrid AI scoring and planning whenever the provider is live.</span>
+            </div>
+          </div>
+          <div class="auth-visual-grid">
+            <div class="auth-visual-card auth-visual-card-large">
+              <span class="auth-visual-label">Roadmap</span>
+              <strong>6 Weeks</strong>
+              <small>Clear upskilling steps for missing skills</small>
+            </div>
+            <div class="auth-visual-card">
+              <span class="auth-visual-label">Roles</span>
+              <strong>5+</strong>
+            </div>
+            <div class="auth-visual-card">
+              <span class="auth-visual-label">Reports</span>
+              <strong>Saved</strong>
+            </div>
+          </div>
+        </article>
+
+        <section class="glass-card auth-card">
+          <div class="section-heading">
+            <p class="eyebrow">Account</p>
+            <h1 class="page-title">Create account</h1>
+          </div>
+          <p class="muted auth-intro">Register once and keep your analysis history, profile, and learning progress in sync.</p>
+          {% if messages %}
+            <div class="message-stack">
+              {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <form method="post" class="auth-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="primary-button">Create account</button>
+          </form>
+          <p class="muted auth-note">Already have one? <a href="{% url 'login' %}">Login</a></p>
+        </section>
       </section>
     </main>
   </body>

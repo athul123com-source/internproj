@@ -15,24 +15,66 @@
       <div class="grid-glow"></div>
     </div>
     <main class="shell auth-shell">
-      <section class="glass-card auth-card">
-        <div class="section-heading">
-          <p class="eyebrow">Account</p>
-          <h1 class="page-title">Login</h1>
-        </div>
-        {% if messages %}
-          <div class="message-stack">
-            {% for message in messages %}
-              <div class="message {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
+      <section class="auth-layout">
+        <article class="glass-card auth-showcase">
+          <div class="auth-showcase-copy">
+            <p class="eyebrow">Resume Insight Studio</p>
+            <h1 class="page-title">Step into a smarter resume evaluation flow.</h1>
+            <p class="muted">
+              Upload your resume, compare it against real job roles, uncover missing skills, and turn each gap into a guided plan.
+            </p>
           </div>
-        {% endif %}
-        <form method="post" class="auth-form">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit" class="primary-button">Sign in</button>
-        </form>
-        <p class="muted auth-note">No account yet? <a href="{% url 'register' %}">Create one</a></p>
+          <div class="auth-feature-stack">
+            <div class="auth-feature-card">
+              <strong>Role-fit scoring</strong>
+              <span>See resume score, ATS score, and role-match in one dashboard.</span>
+            </div>
+            <div class="auth-feature-card">
+              <strong>Learning roadmap</strong>
+              <span>Get week-by-week upskilling guidance for the skills you still need.</span>
+            </div>
+            <div class="auth-feature-card">
+              <strong>Progress tracking</strong>
+              <span>Mark completed skills and watch your readiness score improve.</span>
+            </div>
+          </div>
+          <div class="auth-visual-grid">
+            <div class="auth-visual-card auth-visual-card-large">
+              <span class="auth-visual-label">Score Pulse</span>
+              <strong>63%</strong>
+              <small>Current role readiness snapshot</small>
+            </div>
+            <div class="auth-visual-card">
+              <span class="auth-visual-label">AI + Rules</span>
+              <strong>Hybrid</strong>
+            </div>
+            <div class="auth-visual-card">
+              <span class="auth-visual-label">Export</span>
+              <strong>PDF</strong>
+            </div>
+          </div>
+        </article>
+
+        <section class="glass-card auth-card">
+          <div class="section-heading">
+            <p class="eyebrow">Account</p>
+            <h1 class="page-title">Login</h1>
+          </div>
+          <p class="muted auth-intro">Access your saved dashboards, profile, and resume progress history.</p>
+          {% if messages %}
+            <div class="message-stack">
+              {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <form method="post" class="auth-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="primary-button">Sign in</button>
+          </form>
+          <p class="muted auth-note">No account yet? <a href="{% url 'register' %}">Create one</a></p>
+        </section>
       </section>
     </main>
   </body>
