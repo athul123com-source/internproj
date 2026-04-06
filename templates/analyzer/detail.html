@@ -261,7 +261,7 @@
         </article>
       </section>
 
-      {% if analysis.ai_score or analysis.ai_score == 0 or analysis.ai_error %}
+      {% if analysis.ai_score or analysis.ai_score == 0 or analysis.ai_error or analysis.ai_readiness %}
         <section class="wide-grid">
           <article class="glass-card wide-card">
             <div class="section-heading compact">
@@ -275,10 +275,21 @@
                 <li>Rule-based score: {{ analysis.rule_based_resume_score }}%</li>
                 <li>Final score shown above uses hybrid scoring.</li>
               </ul>
-            {% else %}
+            {% elif analysis.ai_error %}
               <ul class="stack-list">
                 <li>AI is configured but the latest AI request did not complete successfully.</li>
                 <li>{{ analysis.ai_error }}</li>
+              </ul>
+            {% elif analysis.ai_readiness.provider != "disabled" %}
+              <ul class="stack-list">
+                <li>This saved dashboard does not have an AI result attached yet.</li>
+                <li>Upload and analyze the resume again after your AI provider settings are live to generate AI scoring and AI planning.</li>
+                <li>Current provider: {{ analysis.ai_readiness.provider }} | Status at save time: {{ analysis.ai_readiness.status }}</li>
+              </ul>
+            {% else %}
+              <ul class="stack-list">
+                <li>AI is not active for this saved dashboard.</li>
+                <li>Enable the AI provider and re-run the analysis to attach AI scoring and AI planning.</li>
               </ul>
             {% endif %}
           </article>

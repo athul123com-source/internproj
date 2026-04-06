@@ -855,7 +855,9 @@ def build_course_recommendations(missing_skills):
 
 def apply_learning_progress(analysis):
     completed_skills = sorted({skill for skill in analysis.get("completed_skills", []) if skill})
-    original_missing = analysis.get("all_missing_skills") or analysis.get("missing_skills", [])
+    original_missing = analysis.get("all_missing_skills") or list(
+        dict.fromkeys([*(analysis.get("missing_skills") or []), *completed_skills])
+    )
     matched_skills = analysis.get("matched_skills", [])
     remaining_missing = [skill for skill in original_missing if skill not in completed_skills]
     completed_relevant = [skill for skill in completed_skills if skill in original_missing]
@@ -886,6 +888,7 @@ def apply_learning_progress(analysis):
         roadmap = build_learning_roadmap(remaining_missing)
 
     analysis["completed_skills"] = completed_relevant
+    analysis["all_missing_skills"] = original_missing
     analysis["missing_skills"] = remaining_missing
     analysis["prioritized_gaps"] = prioritize_missing_skills(remaining_missing, analysis.get("jd_skills", []))
     analysis["learning_roadmap"] = roadmap

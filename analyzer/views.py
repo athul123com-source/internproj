@@ -120,8 +120,11 @@ def toggle_skill_completion(request, run_id):
 
     skill = request.POST.get("skill", "").strip().lower()
     analysis = run.analysis_data or {}
-    missing_skills = analysis.get("all_missing_skills") or analysis.get("missing_skills", [])
-    if skill not in missing_skills:
+    tracked_skills = sorted(
+        set(analysis.get("all_missing_skills") or analysis.get("missing_skills", []))
+        | set(analysis.get("completed_skills", []))
+    )
+    if skill not in tracked_skills:
         messages.error(request, "That skill is not available for progress tracking on this report.")
         return redirect("detail", run_id=run.id)
 
