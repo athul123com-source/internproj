@@ -103,6 +103,19 @@ def history(request):
 
 
 @login_required
+@require_POST
+def delete_run(request, run_id):
+    run = get_object_or_404(AnalysisRun, id=run_id)
+    if run.owner != request.user:
+        raise Http404("This dashboard is not available.")
+
+    filename = run.filename
+    run.delete()
+    messages.success(request, f"Deleted analysis for {filename}.")
+    return redirect("history")
+
+
+@login_required
 def detail(request, run_id):
     run = get_object_or_404(AnalysisRun, id=run_id)
     if run.owner != request.user:

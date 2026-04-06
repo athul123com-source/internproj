@@ -92,6 +92,13 @@ class ServiceTests(TestCase):
         self.assertIn("html", progressed["completed_skills"])
         self.assertNotIn("html", progressed["missing_skills"])
 
+    def test_learning_progress_handles_string_ai_roadmap_items(self):
+        analysis = analyze_resume("React Git testing", "frontend-developer", "resume.txt")
+        analysis["ai_learning_roadmap"] = ["Finish the HTML course and rebuild one semantic landing page."]
+        progressed = apply_learning_progress(analysis)
+        self.assertTrue(progressed["learning_roadmap"])
+        self.assertEqual(progressed["learning_roadmap"][0]["focus"], "general improvement")
+
 
 class ViewFlowTests(TestCase):
     def setUp(self):
@@ -213,3 +220,17 @@ class ViewFlowTests(TestCase):
         run.refresh_from_db()
         self.assertIn("html", run.analysis_data["completed_skills"])
         self.assertGreater(run.resume_score, run.analysis_data["base_resume_score"])
+
+    def test_history_delete_removes_saved_analysis(self):
+        self.login()
+        run = AnalysisRun.objects.create(
+            owner=self.user,
+            role="Frontend Developer",
+            filename="old-resume.txt",
+            resume_score=55,
+            analysis_data=analyze_resume("React Git testing", "frontend-developer", "resume.txt"),
+        )
+        response = self.client.post(reverse("delete_run", args=[run.id]), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(AnalysisRun.objects.filter(id=run.id).exists())
+        self.assertContains(response, "Deleted analysis for old-resume.txt.")

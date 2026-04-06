@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import detail, export_report, history, home, profile, register, toggle_skill_completion, upload_resume
+from .views import delete_run, detail, export_report, history, home, profile, register, toggle_skill_completion, upload_resume
 
 
 urlpatterns = [
@@ -8,6 +8,7 @@ urlpatterns = [
     path("upload/", upload_resume, name="upload"),
     path("profile/", profile, name="profile"),
     path("history/", history, name="history"),
+    path("history/<int:run_id>/delete/", delete_run, name="delete_run"),
     path("dashboard/<int:run_id>/", detail, name="detail"),
     path("dashboard/<int:run_id>/progress/", toggle_skill_completion, name="toggle_skill_completion"),
     path("dashboard/<int:run_id>/export/", export_report, name="export_report"),

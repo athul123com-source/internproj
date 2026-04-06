@@ -436,6 +436,15 @@ textarea:focus,
   font: inherit;
 }
 
+.history-delete-form {
+  margin: 0;
+}
+
+.delete-link {
+  cursor: pointer;
+  color: #ffb4b4;
+}
+
 .auth-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);

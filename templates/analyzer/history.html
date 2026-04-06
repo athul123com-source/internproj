@@ -28,6 +28,14 @@
         </div>
       </nav>
 
+      {% if messages %}
+        <div class="message-stack">
+          {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
       <section class="glass-card history-card page-card">
         <div class="section-heading">
           <p class="eyebrow">History</p>
@@ -68,6 +76,10 @@
                 <div class="history-score">{{ run.resume_score }}%</div>
                 <a href="{% url 'detail' run.id %}" class="ghost-link">Open</a>
                 <a href="{% url 'export_report' run.id %}" class="ghost-link">Export</a>
+                <form method="post" action="{% url 'delete_run' run.id %}" class="history-delete-form">
+                  {% csrf_token %}
+                  <button type="submit" class="ghost-link delete-link">Delete</button>
+                </form>
               </div>
             </div>
           {% empty %}

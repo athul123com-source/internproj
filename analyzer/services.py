@@ -853,6 +853,41 @@ def build_course_recommendations(missing_skills):
     return items
 
 
+def sanitize_roadmap_items(items):
+    cleaned_items = []
+    if not isinstance(items, list):
+        return cleaned_items
+
+    for index, item in enumerate(items, start=1):
+        if isinstance(item, dict):
+            focus = normalize_whitespace(str(item.get("focus", ""))).lower()
+            mission = normalize_whitespace(str(item.get("mission", "")))
+            output = normalize_whitespace(str(item.get("output", "")))
+            week = normalize_whitespace(str(item.get("week", ""))) or f"Week {index}"
+            if focus and mission and output:
+                cleaned_items.append(
+                    {
+                        "week": week,
+                        "focus": focus,
+                        "mission": mission,
+                        "output": output,
+                    }
+                )
+        elif isinstance(item, str):
+            compact = normalize_whitespace(item)
+            if compact:
+                cleaned_items.append(
+                    {
+                        "week": f"Week {index}",
+                        "focus": "general improvement",
+                        "mission": compact,
+                        "output": "Document one finished artifact or practice result for this step.",
+                    }
+                )
+
+    return cleaned_items
+
+
 def apply_learning_progress(analysis):
     completed_skills = sorted({skill for skill in analysis.get("completed_skills", []) if skill})
     original_missing = analysis.get("all_missing_skills") or list(
@@ -880,10 +915,10 @@ def apply_learning_progress(analysis):
             projected_rule_score,
         )
 
-    ai_learning_roadmap = analysis.get("ai_learning_roadmap") or []
+    ai_learning_roadmap = sanitize_roadmap_items(analysis.get("ai_learning_roadmap") or [])
     roadmap = []
     if ai_learning_roadmap:
-        roadmap = [item for item in ai_learning_roadmap if item.get("focus") not in completed_relevant]
+        roadmap = [item for item in ai_learning_roadmap if item["focus"] not in completed_relevant]
     if not roadmap:
         roadmap = build_learning_roadmap(remaining_missing)
 
@@ -893,6 +928,7 @@ def apply_learning_progress(analysis):
     analysis["prioritized_gaps"] = prioritize_missing_skills(remaining_missing, analysis.get("jd_skills", []))
     analysis["learning_roadmap"] = roadmap
     analysis["course_recommendations"] = build_course_recommendations(remaining_missing)
+    analysis["ai_learning_roadmap"] = ai_learning_roadmap
     analysis["match_rate"] = projected_match_rate
     analysis["resume_score"] = projected_resume_score
     analysis["score_gain"] = projected_resume_score - analysis.get("base_resume_score", projected_resume_score)
