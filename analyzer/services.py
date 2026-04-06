@@ -392,16 +392,13 @@ def extract_resume_text(uploaded_file):
         reader = PdfReader(BytesIO(raw))
         text = repair_fragmented_pdf_text("\n".join((page.extract_text() or "") for page in reader.pages).strip())
         if not has_meaningful_text(text):
-            ocr_text = extract_text_with_ocr(raw, uploaded_file.name)
-            if has_meaningful_text(ocr_text):
-                return repair_fragmented_pdf_text(ocr_text)
             if is_likely_scanned_pdf(raw):
                 raise ValueError(
-                    "This PDF looks like an image/scanned resume, and OCR is not configured or could not extract enough text. "
-                    "Please upload a text-based PDF, DOCX, or TXT file."
+                    "This PDF looks like a scanned or image-based resume and cannot be analyzed right now. "
+                    "Please upload a text-based PDF, DOCX, or TXT file instead."
                 )
             raise ValueError(
-                "Text could not be extracted reliably from this PDF, and OCR could not recover enough text either. "
+                "Text could not be extracted reliably from this PDF. "
                 "Please try a DOCX or TXT file."
             )
         return text

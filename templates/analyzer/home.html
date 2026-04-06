@@ -96,7 +96,7 @@
           <label class="uploader" for="{{ form.resume.id_for_label }}">
             {{ form.resume }}
             <span class="upload-title">Drop resume here or click to browse</span>
-            <span class="upload-subtitle">Supports PDF, DOCX, and TXT up to 7MB. Scanned PDFs can use OCR when configured.</span>
+            <span class="upload-subtitle">Supports PDF, DOCX, and TXT up to 7MB. Scanned or image-based PDFs are not supported right now.</span>
           </label>
           {% if form.resume.errors %}
             <small class="error-text">{{ form.resume.errors|join:", " }}</small>
