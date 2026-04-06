@@ -1,4 +1,5 @@
 from io import BytesIO
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -31,6 +32,56 @@ class ServiceTests(TestCase):
         roadmap = analysis["learning_roadmap"]
         self.assertTrue(any("TypeScript" in item["output"] or "TypeScript" in item["mission"] for item in roadmap))
         self.assertTrue(any("Redux Toolkit" in item["output"] or "Redux Toolkit" in item["mission"] for item in roadmap if item["focus"] == "redux"))
+
+    def test_ai_readiness_defaults_to_disabled_without_configuration(self):
+        analysis = analyze_resume("React Git testing", "frontend-developer", "resume.txt")
+        self.assertEqual(analysis["ai_readiness"]["status"], "disabled")
+        self.assertFalse(analysis["ai_readiness"]["active"])
+        self.assertIn("scoring", analysis["ai_readiness"]["prompt_preview"])
+
+    def test_ai_readiness_can_prepare_optional_flags_without_enabling_runtime(self):
+        with patch.dict(
+            "os.environ",
+            {
+                "AI_PROVIDER": "openai",
+                "AI_MODEL": "gpt-5.4-mini",
+                "AI_SCORING_ENABLED": "True",
+                "AI_PLANNING_ENABLED": "True",
+            },
+            clear=False,
+        ):
+            analysis = analyze_resume("React Git testing", "frontend-developer", "resume.txt")
+        self.assertEqual(analysis["ai_readiness"]["status"], "waiting_for_provider")
+        self.assertTrue(analysis["ai_readiness"]["supports"]["scoring"])
+        self.assertTrue(analysis["ai_readiness"]["supports"]["planning"])
+
+    @patch("analyzer.services.generate_ai_resume_insights")
+    def test_ai_result_enables_hybrid_score_and_ai_roadmap(self, mocked_ai):
+        mocked_ai.return_value = {
+            "active": True,
+            "status": "active",
+            "provider": "openai",
+            "model": "gpt-5-mini",
+            "ai_score": 84,
+            "summary": "AI sees strong frontend fundamentals with a few notable delivery gaps.",
+            "strengths": ["Explains frontend work with good technical depth."],
+            "gaps": ["Needs clearer portfolio evidence for TypeScript."],
+            "recommendations": ["Ship one typed React project and document the architecture choices."],
+            "roadmap": [
+                {
+                    "week": "Week 1",
+                    "focus": "typescript",
+                    "mission": "Convert a small React app to TypeScript and remove all type errors.",
+                    "output": "A TypeScript React repo with typed props, hooks, and README notes.",
+                }
+            ],
+            "error": "",
+        }
+        analysis = analyze_resume("React Git testing", "frontend-developer", "resume.txt")
+        self.assertEqual(analysis["ai_score"], 84)
+        self.assertEqual(analysis["score_mode"], "Hybrid AI + Rule-based")
+        self.assertEqual(analysis["learning_roadmap"][0]["focus"], "typescript")
+        self.assertIn("portfolio evidence", " ".join(analysis["warnings"]).lower())
 
 
 class ViewFlowTests(TestCase):

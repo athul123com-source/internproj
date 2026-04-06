@@ -54,6 +54,32 @@ DJANGO_CSRF_TRUSTED_ORIGINS=https://your-app-domain.com
 OCR_SPACE_API_KEY=your-ocr-space-api-key
 ```
 
+Optional AI-ready variables for future integration:
+
+```bash
+AI_PROVIDER=disabled
+AI_MODEL=gpt-5-mini
+AI_PDF_MODEL=gpt-5
+AI_PDF_REVIEW_ENABLED=False
+AI_SCORING_ENABLED=False
+AI_PLANNING_ENABLED=False
+OPENAI_API_KEY=
+```
+
+The project can now run in hybrid mode when the AI flags are enabled. A good starter setup is:
+
+```bash
+AI_PROVIDER=openai
+AI_MODEL=gpt-5-mini
+AI_PDF_MODEL=gpt-5
+AI_PDF_REVIEW_ENABLED=True
+AI_SCORING_ENABLED=True
+AI_PLANNING_ENABLED=True
+OPENAI_API_KEY=your-openai-key
+```
+
+If the AI request fails or is not configured, the app falls back to the existing rule-based score and roadmap.
+
 See [SHARE_DEPLOYMENT.txt](/d:/Intern/SHARE_DEPLOYMENT.txt) for a simple deployment guide.
 
 ## Notes

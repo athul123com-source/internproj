@@ -28,8 +28,16 @@ def upload_resume(request):
         job_description = form.cleaned_data["job_description"]
 
         try:
+            raw_file_bytes = resume.read()
+            resume.seek(0)
             extracted_text = extract_resume_text(resume)
-            analysis = analyze_resume(extracted_text, role, resume.name, job_description=job_description)
+            analysis = analyze_resume(
+                extracted_text,
+                role,
+                resume.name,
+                job_description=job_description,
+                raw_file_bytes=raw_file_bytes,
+            )
             run = AnalysisRun.objects.create(
                 owner=request.user,
                 role=analysis["role"],
@@ -130,6 +138,10 @@ def export_report(request, run_id):
     write_line(f"Filename: {run.filename}")
     write_line(f"Role: {run.role}")
     write_line(f"Resume Score: {run.resume_score}%")
+    if data.get("ai_score") is not None:
+        write_line(f"AI Score: {data.get('ai_score', 0)}%")
+        write_line(f"Rule-based Score: {data.get('rule_based_resume_score', 0)}%")
+        write_line(f"Score Mode: {data.get('score_mode', 'Hybrid AI + Rule-based')}")
     write_line(f"Role Match: {data.get('match_rate', 0)}%")
     write_line(f"ATS Score: {data.get('ats_score', 0)}%")
     write_line(f"Experience Level: {data.get('experience_level', 'Unknown')}")
@@ -146,6 +158,10 @@ def export_report(request, run_id):
     write_line("Recommendations", gap=24, bold=True)
     for item in data.get("recommendations", [])[:6]:
         write_line(f"- {item}")
+
+    if data.get("ai_summary"):
+        write_line("AI Review", gap=24, bold=True)
+        write_line(data.get("ai_summary", ""))
 
     write_line("Bullet Improvements", gap=24, bold=True)
     for item in data.get("bullet_improvements", [])[:3]:

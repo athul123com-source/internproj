@@ -43,6 +43,7 @@
           <h1 class="page-title">{{ analysis.role }} readiness report</h1>
           <p class="muted">{{ analysis.role_summary }}</p>
           <p class="muted">{{ analysis.job_description_summary }}</p>
+          <p class="muted">Scoring mode: {{ analysis.score_mode }}</p>
         </div>
         <div class="summary-meta">
           <div>
@@ -62,6 +63,13 @@
           <strong>{{ analysis.resume_score }}%</strong>
           <div class="progress-track"><div class="progress-fill" style="width: {{ analysis.resume_score }}%"></div></div>
         </article>
+        {% if analysis.ai_score or analysis.ai_score == 0 %}
+          <article class="glass-card metric-card">
+            <span>AI score</span>
+            <strong>{{ analysis.ai_score }}%</strong>
+            <div class="progress-track"><div class="progress-fill warm" style="width: {{ analysis.ai_score }}%"></div></div>
+          </article>
+        {% endif %}
         <article class="glass-card metric-card">
           <span>Role match</span>
           <strong>{{ analysis.match_rate }}%</strong>
@@ -229,6 +237,30 @@
           </ul>
         </article>
       </section>
+
+      {% if analysis.ai_score or analysis.ai_score == 0 or analysis.ai_error %}
+        <section class="wide-grid">
+          <article class="glass-card wide-card">
+            <div class="section-heading compact">
+              <p class="eyebrow">AI Review</p>
+              <h3>Model-assisted scoring and planning</h3>
+            </div>
+            {% if analysis.ai_score or analysis.ai_score == 0 %}
+              <p class="muted">{{ analysis.ai_summary }}</p>
+              <ul class="stack-list">
+                <li>AI score: {{ analysis.ai_score }}%</li>
+                <li>Rule-based score: {{ analysis.rule_based_resume_score }}%</li>
+                <li>Final score shown above uses hybrid scoring.</li>
+              </ul>
+            {% else %}
+              <ul class="stack-list">
+                <li>AI is configured but the latest AI request did not complete successfully.</li>
+                <li>{{ analysis.ai_error }}</li>
+              </ul>
+            {% endif %}
+          </article>
+        </section>
+      {% endif %}
 
       {% if analysis.bullet_improvements %}
         <section class="wide-grid">

@@ -7,6 +7,8 @@ from PyPDF2 import PdfReader
 from docx import Document
 import requests
 
+from .ai import build_ai_readiness_snapshot, generate_ai_resume_insights
+
 
 JOB_ROLES = {
     "frontend-developer": {
@@ -497,7 +499,7 @@ def extract_docx_text_fallback(raw):
     return re.sub(r"\s+", " ", text).strip()
 
 
-def analyze_resume(text, role_key, filename, job_description=""):
+def analyze_resume(text, role_key, filename, job_description="", raw_file_bytes=None):
     role = JOB_ROLES[role_key]
     extracted_skills = extract_skills(text)
     jd_analysis = analyze_job_description(job_description, role)
@@ -513,6 +515,68 @@ def analyze_resume(text, role_key, filename, job_description=""):
     prioritized_gaps = prioritize_missing_skills(missing_skills, jd_analysis["jd_skills"])
     course_recommendations = build_course_recommendations(missing_skills)
     bullet_improvements = build_bullet_improvements(highlights, matched_skills, missing_skills)
+    recommendations = build_recommendations(missing_skills)
+    learning_roadmap = build_learning_roadmap(missing_skills)
+    interview_questions = build_interview_questions(role, matched_skills, missing_skills)
+    strengths = [
+        f"{len(matched_skills)} relevant skills match the target role.",
+        *ats["strengths"][:2],
+        "Resume includes readable content blocks that can be sharpened into stronger bullets." if highlights else "",
+    ]
+    warnings = ats["warnings"]
+    ai_readiness = build_ai_readiness_snapshot(
+        filename=filename,
+        role_title=role["title"],
+        role_summary=role["summary"],
+        resume_text=text,
+        job_description=job_description,
+        matched_skills=matched_skills,
+        missing_skills=missing_skills,
+        resume_score=resume_score,
+        match_rate=match_rate,
+        ats_score=ats["score"],
+        roadmap=learning_roadmap,
+    )
+    ai_result = generate_ai_resume_insights(
+        filename=filename,
+        role_title=role["title"],
+        role_summary=role["summary"],
+        extracted_text=text,
+        job_description=job_description,
+        matched_skills=matched_skills,
+        missing_skills=missing_skills,
+        rule_score=resume_score,
+        match_rate=match_rate,
+        ats_score=ats["score"],
+        raw_file_bytes=raw_file_bytes,
+    )
+
+    if ai_result["active"] and ai_result["ai_score"] is not None:
+        resume_score = round(resume_score * 0.55 + ai_result["ai_score"] * 0.45)
+        if ai_result["roadmap"]:
+            learning_roadmap = ai_result["roadmap"]
+        if ai_result["recommendations"]:
+            merged_recommendations = []
+            for item in [*ai_result["recommendations"], *recommendations]:
+                cleaned = normalize_whitespace(item)
+                if cleaned and cleaned not in merged_recommendations:
+                    merged_recommendations.append(cleaned)
+            recommendations = merged_recommendations
+        if ai_result["strengths"]:
+            for item in ai_result["strengths"]:
+                cleaned = normalize_whitespace(item)
+                if cleaned and cleaned not in strengths:
+                    strengths.append(cleaned)
+        if ai_result["gaps"]:
+            for item in ai_result["gaps"]:
+                cleaned = normalize_whitespace(item)
+                if cleaned and cleaned not in warnings:
+                    warnings.append(cleaned)
+
+        ai_readiness["active"] = True
+        ai_readiness["status"] = "active"
+        ai_readiness["provider"] = ai_result["provider"]
+        ai_readiness["model"] = ai_result["model"]
 
     return {
         "filename": filename,
@@ -521,6 +585,8 @@ def analyze_resume(text, role_key, filename, job_description=""):
         "job_description_used": bool(job_description.strip()),
         "job_description_summary": jd_analysis["summary"],
         "resume_score": resume_score,
+        "rule_based_resume_score": round(match_rate * 0.6 + ats["score"] * 0.4),
+        "score_mode": "Hybrid AI + Rule-based" if ai_result["active"] and ai_result["ai_score"] is not None else "Rule-based",
         "match_rate": match_rate,
         "ats_score": ats["score"],
         "experience_level": experience_level,
@@ -530,17 +596,18 @@ def analyze_resume(text, role_key, filename, job_description=""):
         "section_scores": section_scores,
         "course_recommendations": course_recommendations,
         "bullet_improvements": bullet_improvements,
-        "strengths": [
-            f"{len(matched_skills)} relevant skills match the target role.",
-            *ats["strengths"][:2],
-            "Resume includes readable content blocks that can be sharpened into stronger bullets." if highlights else "",
-        ],
-        "warnings": ats["warnings"],
-        "recommendations": build_recommendations(missing_skills),
-        "learning_roadmap": build_learning_roadmap(missing_skills),
-        "interview_questions": build_interview_questions(role, matched_skills, missing_skills),
+        "strengths": strengths,
+        "warnings": warnings,
+        "recommendations": recommendations,
+        "learning_roadmap": learning_roadmap,
+        "interview_questions": interview_questions,
         "highlights": highlights,
         "suggested_tools": role["tools"],
+        "ai_readiness": ai_readiness,
+        "ai_score": ai_result["ai_score"],
+        "ai_summary": ai_result["summary"],
+        "ai_learning_roadmap": ai_result["roadmap"],
+        "ai_error": ai_result["error"],
     }
 
 
